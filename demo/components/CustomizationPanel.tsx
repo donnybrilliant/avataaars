@@ -29,7 +29,7 @@ import {
   EYEBROW_TYPES,
   MOUTH_TYPES,
   SKIN_COLORS,
-} from "../types/optionValues";
+} from "../../dist";
 
 /**
  * Top types that represent hats (used for conditional hatColor display)
