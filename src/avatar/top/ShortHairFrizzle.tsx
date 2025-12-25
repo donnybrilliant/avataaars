@@ -1,21 +1,22 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HairColor from './HairColor'
+import FacialHair from './facialHair';
+import HairColor from './HairColor';
+import { withOptionValue } from '../../utils/optionValue';
+const optionValue = 'ShortHairFrizzle';
 
-export default class ShortHairFrizzle extends React.Component {
-  static optionValue = 'ShortHairFrizzle'
+interface Props {
+  children?: ReactNode;
+}
 
-  private filter1 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
+function ShortHairFrizzle({ children }: Props) {
+  const filter1 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
 
-  render () {
-    const { filter1, mask1, mask2, path1, path2 } = this
-    return (
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path2} x='0' y='0' width='264' height='280' />
@@ -66,10 +67,12 @@ export default class ShortHairFrizzle extends React.Component {
               xlinkHref={'#' + path1}
             />
             <HairColor maskID={mask1} />
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(ShortHairFrizzle, optionValue);

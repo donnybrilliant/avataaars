@@ -1,16 +1,15 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
 
-import Colors from './Colors'
+import Colors from './Colors';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class ShirtCrewNeck extends React.Component {
-  static optionValue = 'ShirtCrewNeck'
-  private path1 = uniqueId('react-path-')
-  private mask1 = uniqueId('react-mask-')
+const optionValue = 'ShirtCrewNeck';
 
-  render () {
-    const { path1, mask1 } = this
-    return (
+function ShirtCrewNeck() {
+  const mask1 = useId();
+  const path1 = useId();
+
+  return (
       <g
         id='Clothing/Shirt-Crew-Neck'
         transform='translate(0.000000, 170.000000)'>
@@ -48,6 +47,8 @@ export default class ShirtCrewNeck extends React.Component {
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(ShirtCrewNeck, optionValue);

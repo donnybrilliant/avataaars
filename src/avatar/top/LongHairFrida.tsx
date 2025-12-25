@@ -1,35 +1,26 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
+import FacialHair from './facialHair';
+import { withOptionValue } from '../../utils/optionValue';
+const optionValue = 'LongHairFrida';
 
-export default class LongHairFrida extends React.Component {
-  static optionValue = 'LongHairFrida'
-  private filter1 = uniqueId('react-filter-')
-  private filter2 = uniqueId('react-filter-')
-  private filter3 = uniqueId('react-filter-')
-  private filter4 = uniqueId('react-filter-')
-  private filter5 = uniqueId('react-filter-')
-  private filter6 = uniqueId('react-filter-')
-  private filter7 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const {
-      filter1,
-      filter2,
-      filter3,
-      filter4,
-      filter5,
-      filter6,
-      filter7,
-      mask1,
-      path1,
-      path2
-    } = this
-    return (
+function LongHairFrida({ children }: Props) {
+  const filter1 = useId();
+  const filter2 = useId();
+  const filter3 = useId();
+  const filter4 = useId();
+  const filter5 = useId();
+  const filter6 = useId();
+  const filter7 = useId();
+  const mask1 = useId();
+  const path1 = useId();
+  const path2 = useId();
+
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path2} x='0' y='0' width='264' height='280' />
@@ -353,10 +344,12 @@ export default class LongHairFrida extends React.Component {
               />
             </g>
             <FacialHair />
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(LongHairFrida, optionValue);

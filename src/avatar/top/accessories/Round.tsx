@@ -1,14 +1,11 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
+import { withOptionValue } from '../../../utils/optionValue';
 
-export default class Round extends React.Component {
-  static optionValue = 'Round'
+const optionValue = 'Round';
 
-  private path1 = uniqueId('react-path-')
-  private filter1 = uniqueId('react-filter-')
-
-  render () {
-    const { path1, filter1 } = this
+function Round() {
+  const path1 = useId();
+  const filter1 = useId();
     return (
       <g
         id='Top/_Resources/Round'
@@ -49,6 +46,7 @@ export default class Round extends React.Component {
           <use fill='#252C2F' fillRule='evenodd' xlinkHref={'#' + path1} />
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Round, optionValue);

@@ -1,20 +1,23 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HatColor from './HatColor'
+import FacialHair from './facialHair';
+import HatColor from './HatColor';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class WinterHat2 extends React.Component {
-  static optionValue = 'WinterHat2'
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
-  private path3 = uniqueId('react-path-')
+const optionValue = 'WinterHat2';
 
-  render () {
-    const { mask1, mask2, path1, path2, path3 } = this
-    return (
+interface Props {
+  children?: ReactNode;
+}
+
+function WinterHat2({ children }: Props) {
+  const path1 = useId();
+  const path2 = useId();
+  const path3 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+
+  return (
       <g id='Top'>
         <defs>
           <rect id={path3} x='0' y='0' width='264' height='280' />
@@ -108,9 +111,10 @@ export default class WinterHat2 extends React.Component {
             </g>
           </g>
           <FacialHair />
-          {this.props.children}
+          {children}
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(WinterHat2, optionValue);

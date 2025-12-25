@@ -1,19 +1,20 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
+import FacialHair from './facialHair';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class Hat extends React.Component {
-  static optionValue = 'Hat'
+const optionValue = 'Hat';
 
-  private filter1 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const { filter1, mask1, mask2, path1, path2 } = this
+function Hat({ children }: Props) {
+  const filter1 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
     return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
@@ -87,10 +88,11 @@ export default class Hat extends React.Component {
               />
             </g>
             <FacialHair />
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Hat, optionValue);

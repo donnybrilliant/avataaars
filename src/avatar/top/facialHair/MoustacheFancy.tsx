@@ -1,16 +1,13 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
 
-import Colors from './Colors'
+import Colors from './Colors';
+import { withOptionValue } from '../../../utils/optionValue';
 
-export default class MoustacheFancy extends React.Component {
-  static optionValue = 'MoustacheFancy'
+const optionValue = 'MoustacheFancy';
 
-  private mask1 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-
-  render () {
-    const { mask1, path1 } = this
+function MoustacheFancy() {
+  const mask1 = useId();
+  const path1 = useId();
     return (
       <g
         id='Facial-Hair/Moustache-Fancy'
@@ -32,6 +29,7 @@ export default class MoustacheFancy extends React.Component {
         />
         <Colors maskID={mask1} />
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(MoustacheFancy, optionValue);

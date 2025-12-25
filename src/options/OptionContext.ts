@@ -1,136 +1,283 @@
-import Option from './Option'
+/**
+ * Option Context - State management for avatar options
+ *
+ * This module provides the OptionContext class, which manages the state
+ * of all avatar customization options. It implements a publish-subscribe
+ * pattern for reactive updates when option values change.
+ *
+ * @module OptionContext
+ */
 
-export interface OptionState {
-  key: string
-  options: Array<string>
-  defaultValue?: string
-  available: number
-}
+import type {
+  Option,
+  OptionKey,
+  OptionState,
+  OptionContextState,
+} from "../types";
 
-export type OptionContextState = { [index: string]: OptionState }
+// Re-export for backward compatibility
+export type { OptionState, OptionContextState };
 
+/**
+ * OptionContext manages the state of all avatar customization options.
+ *
+ * This class provides:
+ * - Centralized state management for all avatar options
+ * - Publish-subscribe pattern for reactive updates
+ * - Default value handling
+ * - Option availability tracking
+ *
+ * @example
+ * ```ts
+ * const context = new OptionContext(allOptions);
+ * context.setValue("topType", "LongHairStraight");
+ * context.getValue("topType"); // "LongHairStraight"
+ * ```
+ */
 export default class OptionContext {
-  private stateChangeListeners = new Set<Function>()
-  private valueChangeListeners = new Set<Function>()
-  private _state: OptionContextState = {}
-  private _data: { [index: string]: string } = {}
-  private readonly _options: Array<Option>
+  /**
+   * Listeners for state changes (any option state update)
+   */
+  private stateChangeListeners = new Set<() => void>();
 
-  get options () {
-    return this._options
+  /**
+   * Listeners for value changes (specific option value updates)
+   */
+  private valueChangeListeners = new Set<
+    (key: OptionKey, value: string) => void
+  >();
+
+  /**
+   * Current state of all options (metadata, defaults, availability)
+   */
+  private _state: OptionContextState = {} as OptionContextState;
+
+  /**
+   * Current values for all options
+   */
+  private _data: Partial<Record<OptionKey, string>> = {};
+
+  /**
+   * All available options (read-only)
+   */
+  private readonly _options: readonly Option[];
+
+  /**
+   * Get all available options
+   */
+  get options() {
+    return this._options;
   }
 
-  get state () {
-    return this._state
+  /**
+   * Get current state of all options
+   */
+  get state() {
+    return this._state;
   }
 
-  constructor (options: Array<Option>) {
-    this._options = options
+  /**
+   * Create a new OptionContext instance.
+   *
+   * @param options - Array of all available options to manage
+   */
+  constructor(options: readonly Option[]) {
+    this._options = options;
+    const initialState: OptionContextState = {} as OptionContextState;
     for (const option of options) {
-      this._state[option.key] = {
+      initialState[option.key] = {
         key: option.key,
         available: 0,
-        options: []
-      }
+        options: [],
+      };
     }
+    this._state = initialState;
   }
 
-  addStateChangeListener (listener: () => void) {
-    this.stateChangeListeners.add(listener)
+  /**
+   * Add a listener for state changes.
+   * Called whenever any option state is updated.
+   *
+   * @param listener - Callback function to invoke on state changes
+   */
+  addStateChangeListener(listener: () => void) {
+    this.stateChangeListeners.add(listener);
   }
 
-  removeStateChangeListener (listener: () => void) {
-    this.stateChangeListeners.delete(listener)
+  /**
+   * Remove a state change listener.
+   *
+   * @param listener - Callback function to remove
+   */
+  removeStateChangeListener(listener: () => void) {
+    this.stateChangeListeners.delete(listener);
   }
 
-  addValueChangeListener (listener: (key: string, value: string) => void) {
-    this.valueChangeListeners.add(listener)
+  /**
+   * Add a listener for value changes.
+   * Called whenever a specific option value is updated.
+   *
+   * @param listener - Callback function receiving (key, value) on changes
+   */
+  addValueChangeListener(listener: (key: OptionKey, value: string) => void) {
+    this.valueChangeListeners.add(listener);
   }
 
-  removeValueChangeListener (listener: (key: string, value: string) => void) {
-    this.valueChangeListeners.delete(listener)
+  /**
+   * Remove a value change listener.
+   *
+   * @param listener - Callback function to remove
+   */
+  removeValueChangeListener(listener: (key: OptionKey, value: string) => void) {
+    this.valueChangeListeners.delete(listener);
   }
 
-  optionEnter (key: string) {
-    // TODO:
-    const optionState = this.getOptionState(key)!
+  /**
+   * Increment the availability counter for an option.
+   * Used to track how many components are using this option.
+   *
+   * @param key - The option key to increment availability for
+   */
+  optionEnter(key: OptionKey) {
+    const optionState = this.getOptionState(key);
+    if (!optionState) return;
     this.setState({
       [key]: {
         ...optionState,
-        available: optionState.available + 1
-      }
-    })
+        available: optionState.available + 1,
+      },
+    });
   }
 
-  optionExit (key: string) {
-    const optionState = this.getOptionState(key)!
+  /**
+   * Decrement the availability counter for an option.
+   * Used when a component stops using this option.
+   *
+   * @param key - The option key to decrement availability for
+   */
+  optionExit(key: OptionKey) {
+    const optionState = this.getOptionState(key);
+    if (!optionState) return;
     this.setState({
       [key]: {
         ...optionState,
-        available: optionState.available - 1
-      }
-    })
+        available: optionState.available - 1,
+      },
+    });
   }
 
-  getOptionState (key: string): OptionState | null {
-    return this.state[key] || null
+  /**
+   * Get the current state for a specific option.
+   *
+   * @param key - The option key to get state for
+   * @returns OptionState or null if option doesn't exist
+   */
+  getOptionState(key: OptionKey): OptionState | null {
+    return this.state[key] || null;
   }
 
-  getValue (key: string): string | null {
-    const optionState = this.getOptionState(key)!
+  /**
+   * Get the current value for a specific option.
+   * Returns the set value, or the default value if no value is set.
+   *
+   * @param key - The option key to get value for
+   * @returns Current value, default value, or null
+   */
+  getValue(key: OptionKey): string | null {
+    const optionState = this.getOptionState(key);
     if (!optionState) {
-      return null
+      return null;
     }
-    const value = this._data[key]
+    const value = this._data[key];
     if (value) {
-      return value
+      return value;
     }
-    return optionState.defaultValue || null
+    return optionState.defaultValue || null;
   }
 
-  setValue (key: string, value: string) {
-    for (const listener of Array.from(this.valueChangeListeners)) {
-      listener(key, value)
+  /**
+   * Set the value for a specific option.
+   * Triggers value change listeners and state change notification.
+   *
+   * @param key - The option key to set value for
+   * @param value - The value to set
+   */
+  setValue(key: OptionKey, value: string) {
+    this._data[key] = value;
+    for (const listener of this.valueChangeListeners) {
+      listener(key, value);
     }
+    this.notifyListener();
   }
 
-  // set single source of truth
-  setData (data: { [index: string]: string }) {
-    this._data = data
-    this.notifyListener()
+  /**
+   * Set multiple option values at once.
+   * Useful for bulk updates or initialization.
+   *
+   * @param data - Object mapping option keys to values
+   */
+  setData(data: Partial<Record<OptionKey, string>>) {
+    this._data = data;
+    this.notifyListener();
   }
 
-  setDefaultValue (key: string, defaultValue: string) {
-    const optionState = this.getOptionState(key)!
+  /**
+   * Set the default value for an option.
+   * Used when no explicit value is set.
+   *
+   * @param key - The option key to set default for
+   * @param defaultValue - The default value to use
+   */
+  setDefaultValue(key: OptionKey, defaultValue: string) {
+    const optionState = this.getOptionState(key);
+    if (!optionState) return;
     this.setState({
       [key]: {
         ...optionState,
-        defaultValue
-      }
-    })
+        defaultValue,
+      },
+    });
   }
 
-  setOptions (key: string, options: Array<string>) {
+  /**
+   * Set the available option values for a specific option key.
+   * Used by Selector components to register their available options.
+   *
+   * @param key - The option key to set available options for
+   * @param options - Array of available option values
+   */
+  setOptions(key: OptionKey, options: readonly string[]) {
+    const optionState = this.getOptionState(key);
+    if (!optionState) return;
     this.setState({
       [key]: {
-        ...this.state[key],
+        ...optionState,
         key,
-        options
-      }
-    })
+        options,
+      },
+    });
   }
 
-  private setState (state: OptionContextState) {
+  /**
+   * Update the internal state and notify listeners.
+   *
+   * @param state - Partial state update to merge
+   */
+  private setState(state: Partial<OptionContextState>) {
     this._state = {
       ...this.state,
-      ...state
-    }
-    this.notifyListener()
+      ...state,
+    };
+    this.notifyListener();
   }
 
-  private notifyListener () {
-    for (const listener of Array.from(this.stateChangeListeners)) {
-      listener()
+  /**
+   * Notify all state change listeners.
+   * Called whenever state is updated.
+   */
+  private notifyListener() {
+    for (const listener of this.stateChangeListeners) {
+      listener();
     }
   }
 }

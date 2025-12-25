@@ -1,18 +1,16 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
 
 import Colors from './Colors'
 import Graphics from './Graphics'
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class GraphicShirt extends React.Component {
-  static optionValue = 'GraphicShirt'
+const optionValue = 'GraphicShirt';
 
-  private path1 = uniqueId('react-path-')
-  private mask1 = uniqueId('react-mask-')
+function GraphicShirt() {
+  const path1 = useId();
+  const mask1 = useId();
 
-  render () {
-    const { path1, mask1 } = this
-    return (
+  return (
       <g
         id='Clothing/Graphic-Shirt'
         transform='translate(0.000000, 170.000000)'>
@@ -34,6 +32,7 @@ export default class GraphicShirt extends React.Component {
         <Colors maskID={mask1} />
         <Graphics maskID={mask1} />
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(GraphicShirt, optionValue);

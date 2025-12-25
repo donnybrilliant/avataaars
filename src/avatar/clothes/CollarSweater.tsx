@@ -1,17 +1,15 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
 
-import Colors from './Colors'
+import Colors from './Colors';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class CollarSweater extends React.Component {
-  static optionValue = 'CollarSweater'
+const optionValue = 'CollarSweater';
 
-  private path1 = uniqueId('react-path-')
-  private mask1 = uniqueId('react-mask-')
+function CollarSweater() {
+  const path1 = useId();
+  const mask1 = useId();
 
-  render () {
-    const { path1, mask1 } = this
-    return (
+  return (
       <g
         id='Clothing/Collar-+-Sweater'
         transform='translate(0.000000, 170.000000)'>
@@ -38,6 +36,7 @@ export default class CollarSweater extends React.Component {
           fillRule='evenodd'
         />
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(CollarSweater, optionValue);

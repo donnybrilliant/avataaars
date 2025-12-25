@@ -1,13 +1,10 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
+import { withOptionValue } from '../../../utils/optionValue';
 
-export default class Prescription01 extends React.Component {
-  static optionValue = 'Prescription01'
+const optionValue = 'Prescription01';
 
-  private filter1 = uniqueId('react-filter-')
-
-  render () {
-    const { filter1 } = this
+function Prescription01() {
+  const filter1 = useId();
     return (
       <g
         id='Top/_Resources/Prescription-01'
@@ -67,6 +64,7 @@ export default class Prescription01 extends React.Component {
           />
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Prescription01, optionValue);

@@ -1,21 +1,24 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HatColor from './HatColor'
+import FacialHair from './facialHair';
+import HatColor from './HatColor';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class WinterHat3 extends React.Component {
-  static optionValue = 'WinterHat3'
-  private filter1 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
-  private path3 = uniqueId('react-path-')
+const optionValue = 'WinterHat3';
 
-  render() {
-    const { filter1, mask1, mask2, path1, path2, path3 } = this
-    return (
+interface Props {
+  children?: ReactNode;
+}
+
+function WinterHat3({ children }: Props) {
+  const filter1 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
+  const path3 = useId();
+
+  return (
       <g id='Top'>
         <defs>
           <rect id={path3} x='0' y='0' width='264' height='280' />
@@ -73,15 +76,16 @@ export default class WinterHat3 extends React.Component {
             <use
               fill='black'
               fillOpacity='1'
-              filter={`url(#${path2})`}
+              filter={`url(#${filter1})`}
               xlinkHref={'#' + path2}
             />
             <use fill='#F4F4F4' fillRule='evenodd' xlinkHref={'#' + path2} />
           </g>
           <FacialHair />
-          {this.props.children}
+          {children}
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(WinterHat3, optionValue);

@@ -1,19 +1,21 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HairColor from './HairColor'
+import FacialHair from './facialHair';
+import HairColor from './HairColor';
+import { withOptionValue } from '../../utils/optionValue';
+const optionValue = 'LongHairCurvy';
 
-export default class LongHairCurvy extends React.Component {
-  static optionValue = 'LongHairCurvy'
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const { mask1, mask2, path1, path2 } = this
-    return (
+function LongHairCurvy({ children }: Props) {
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
+
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path1} x='0' y='0' width='264' height='280' />
@@ -62,10 +64,12 @@ export default class LongHairCurvy extends React.Component {
               fillRule='evenodd'
             />
             <FacialHair />
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(LongHairCurvy, optionValue);

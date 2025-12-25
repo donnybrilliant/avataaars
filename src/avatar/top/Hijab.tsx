@@ -1,19 +1,20 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import HatColor from './HatColor'
+import HatColor from './HatColor';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class Hijab extends React.Component {
-  static optionValue = 'Hijab'
+const optionValue = 'Hijab';
 
-  private filter1 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const { filter1, mask1, mask2, path1, path2 } = this
+function Hijab({ children }: Props) {
+  const filter1 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
     return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
@@ -83,10 +84,11 @@ export default class Hijab extends React.Component {
               opacity='0.899999976'
               mask={`url(#${mask2})`}
             />
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Hijab, optionValue);

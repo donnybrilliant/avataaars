@@ -1,20 +1,22 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HairColor from './HairColor'
+import FacialHair from './facialHair';
+import HairColor from './HairColor';
+import { withOptionValue } from '../../utils/optionValue';
+const optionValue = 'ShortHairSides';
 
-export default class ShortHairSides extends React.Component {
-  static optionValue = 'ShortHairSides'
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
-  private path3 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const { mask1, mask2, path1, path2, path3 } = this
-    return (
+function ShortHairSides({ children }: Props) {
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
+  const path3 = useId();
+
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path1} x='0' y='0' width='264' height='280' />
@@ -45,10 +47,12 @@ export default class ShortHairSides extends React.Component {
               <use id='Sides' fill='#9E7A7A' xlinkHref={'#' + path3} />
               <HairColor maskID={mask1} />
             </g>
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(ShortHairSides, optionValue);

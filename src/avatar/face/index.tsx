@@ -1,19 +1,19 @@
-import * as React from 'react'
+/**
+ * Modern Face component using extracted Mouth, Eyes, Eyebrow with React.createContext()
+ */
+import Mouth from "./mouth";
+import Eyes from "./eyes";
+import Eyebrow from "./eyebrow";
+import Nose from "./nose";
 
-import Eyebrow from './eyebrow'
-import Eyes from './eyes'
-import Mouth from './mouth'
-import Nose from './nose/Default'
-
-export default class Face extends React.Component {
-  render () {
-    return (
-      <g id='Face' transform='translate(76.000000, 82.000000)' fill='#000000'>
-        <Mouth />
-        <Nose />
-        <Eyes />
-        <Eyebrow />
-      </g>
-    )
-  }
+export default function Face() {
+  return (
+    <g id="Face" transform="translate(76.000000, 82.000000)" fill="#000000">
+      <Mouth />
+      <Nose />
+      <Eyes />
+      <Eyebrow />
+    </g>
+  );
 }
+

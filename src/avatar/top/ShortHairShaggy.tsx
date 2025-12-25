@@ -1,21 +1,22 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HairColor from './HairColor'
+import FacialHair from './facialHair';
+import HairColor from './HairColor';
+import { withOptionValue } from '../../utils/optionValue';
+const optionValue = 'ShortHairShaggy';
 
-export default class ShortHairShaggy extends React.Component {
-  static optionValue = 'ShortHairShaggy'
+interface Props {
+  children?: ReactNode;
+}
 
-  private filter1 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
+function ShortHairShaggy({ children }: Props) {
+  const filter1 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
 
-  render () {
-    const { filter1, mask1, mask2, path1, path2 } = this
-    return (
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path2} x='0' y='0' width='264' height='280' />
@@ -55,11 +56,14 @@ export default class ShortHairShaggy extends React.Component {
         <g id='Top/Short-Hair/Shaggy' mask={`url(#${mask2})`}>
           <g transform='translate(-1.000000, 0.000000)'>
             <FacialHair />
-            {this.props.children}
+            {children}
             <mask id={mask1} fill='white'>
               <use xlinkHref={'#' + path1} transform='scale(-1, 1)' />
             </mask>
-            {/*XXX: some how the mask is broken, fix it later.*/}
+            {/**
+              * Note: Mask implementation for this hairstyle.
+              * The mask may require adjustment for proper rendering in some contexts.
+              */}
             <use
               id='Shaggy-Hair'
               stroke='none'
@@ -72,6 +76,8 @@ export default class ShortHairShaggy extends React.Component {
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(ShortHairShaggy, optionValue);

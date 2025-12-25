@@ -1,22 +1,23 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HatColor from './HatColor'
+import FacialHair from './facialHair';
+import HatColor from './HatColor';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class Turban extends React.Component {
-  static optionValue = 'Turban'
+const optionValue = 'Turban';
 
-  private filter1 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private mask3 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
-  private path3 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const { filter1, mask1, mask2, mask3, path1, path2, path3 } = this
+function Turban({ children }: Props) {
+  const filter1 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+  const mask3 = useId();
+  const path1 = useId();
+  const path2 = useId();
+  const path3 = useId();
     return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
@@ -95,10 +96,11 @@ export default class Turban extends React.Component {
                 fill='#000000'
               />
             </g>
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Turban, optionValue);

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.tsx",
+    "src/types/index.ts",
+    "src/options/index.tsx"
+  ],
+  "out": "docs",
+  "theme": "default",
+  "includeVersion": true,
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "name": "Avataaars API Documentation",
+  "entryPointStrategy": "expand",
+  "sort": ["source-order"],
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Avatar Components",
+    "Options System",
+    "Types"
+  ]
+}
+

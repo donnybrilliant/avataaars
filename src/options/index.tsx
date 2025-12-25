@@ -1,74 +1,96 @@
-import Option from './Option'
+/**
+ * Options module - Avatar customization options
+ * 
+ * This module exports all avatar customization options and the option system.
+ * Each option represents a customizable aspect of the avatar (top, eyes, mouth, etc.).
+ * 
+ * @module Options
+ */
 
-export { default as Option } from './Option'
-export { default as OptionContext, OptionContextState } from './OptionContext'
-export { default as Selector } from './Selector'
+// Re-export types from centralized location
+export type { Option, OptionKey } from "../types";
+import type { Option } from "../types";
 
-export const TopOption = new Option({
-  key: 'topType',
-  label: 'Top',
-})
+export {
+  default as OptionContext,
+  type OptionContextState,
+} from "./OptionContext";
+export { default as Selector, OptionContextReact } from "./Selector";
 
-export const AccessoriesOption = new Option({
-  key: 'accessoriesType',
-  label: '↳ 👓 Accessories',
-})
+/**
+ * All available avatar customization options.
+ * Each option defines a key (used in props) and a label (for UI display).
+ */
 
-export const HatColorOption = new Option({
-  key: 'hatColor',
-  label: '🎨 HatColor',
-})
+export const TopOption: Option = {
+  key: "topType",
+  label: "🎩 Top",
+};
 
-export const HairColorOption = new Option({
-  key: 'hairColor',
-  label: '↳ 💈 Hair Color',
-})
+export const AccessoriesOption: Option = {
+  key: "accessoriesType",
+  label: "👓 Accessories",
+};
 
-export const FacialHairOption = new Option({
-  key: 'facialHairType',
-  label: 'Facial Hair',
-})
+export const HatColorOption: Option = {
+  key: "hatColor",
+  label: "🎨 HatColor",
+};
 
-export const FacialHairColor = new Option({
-  key: 'facialHairColor',
-  label: '↳ ✂️ Facial Hair Color',
-})
+export const HairColorOption: Option = {
+  key: "hairColor",
+  label: "💈 Hair Color",
+};
 
-export const ClotheOption = new Option({
-  key: 'clotheType',
-  label: '👔 Clothes',
-})
+export const FacialHairOption: Option = {
+  key: "facialHairType",
+  label: "🧔 Facial Hair",
+};
 
-export const ClotheColorOption = new Option({
-  key: 'clotheColor',
-  label: '↳ Color Fabric',
-})
+export const FacialHairColor: Option = {
+  key: "facialHairColor",
+  label: "✂️ Facial Hair Color",
+};
 
-export const GraphicOption = new Option({
-  key: 'graphicType',
-  label: '↳ Graphic',
-})
+export const ClotheOption: Option = {
+  key: "clotheType",
+  label: "👔 Clothes",
+};
 
-export const EyesOption = new Option({
-  key: 'eyeType',
-  label: '👁 Eyes',
-})
+export const ClotheColorOption: Option = {
+  key: "clotheColor",
+  label: "🌈 Color Fabric",
+};
 
-export const EyebrowOption = new Option({
-  key: 'eyebrowType',
-  label: '✏️ Eyebrow',
-})
+export const GraphicOption: Option = {
+  key: "graphicType",
+  label: "🖼️ Graphic",
+};
 
-export const MouthOption = new Option({
-  key: 'mouthType',
-  label: '👄 Mouth',
-})
+export const EyesOption: Option = {
+  key: "eyeType",
+  label: "👁 Eyes",
+};
 
-export const SkinOption = new Option({
-  key: 'skinColor',
-  label: '🎨 Skin',
-})
+export const EyebrowOption: Option = {
+  key: "eyebrowType",
+  label: "✏️ Eyebrow",
+};
 
+export const MouthOption: Option = {
+  key: "mouthType",
+  label: "👄 Mouth",
+};
+
+export const SkinOption: Option = {
+  key: "skinColor",
+  label: "🎨 Skin",
+};
+
+/**
+ * Array of all available options.
+ * Used to initialize the OptionContext.
+ */
 export const allOptions = [
   TopOption,
   AccessoriesOption,
@@ -83,4 +105,4 @@ export const allOptions = [
   EyebrowOption,
   MouthOption,
   SkinOption,
-]
+];

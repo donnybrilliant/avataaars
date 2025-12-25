@@ -1,16 +1,13 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
+import { withOptionValue } from '../../../utils/optionValue';
 
-export default class Wayfarers extends React.Component {
-  static optionValue = 'Wayfarers'
+const optionValue = 'Wayfarers';
 
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
-  private filter1 = uniqueId('react-filter-')
-  private linearGradient1 = uniqueId('react-linear-gradient-')
-
-  render () {
-    const { path1, path2, filter1, linearGradient1 } = this
+function Wayfarers() {
+  const path1 = useId();
+  const path2 = useId();
+  const filter1 = useId();
+  const linearGradient1 = useId();
     return (
       <g
         id='Top/_Resources/Wayfarers'
@@ -117,6 +114,7 @@ export default class Wayfarers extends React.Component {
           />
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Wayfarers, optionValue);

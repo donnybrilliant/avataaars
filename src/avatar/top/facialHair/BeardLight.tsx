@@ -1,17 +1,15 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
 
-import Colors from './Colors'
+import Colors from './Colors';
+import { withOptionValue } from '../../../utils/optionValue';
 
-export default class BeardLight extends React.Component {
-  static optionValue = 'BeardLight'
+const optionValue = 'BeardLight';
 
-  private mask1 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
+function BeardLight() {
+  const mask1 = useId();
+  const path1 = useId();
 
-  render () {
-    const { mask1, path1 } = this
-    return (
+  return (
       <g
         id='Facial-Hair/Beard-Light'
         transform='translate(49.000000, 72.000000)'>
@@ -32,6 +30,7 @@ export default class BeardLight extends React.Component {
         />
         <Colors maskID={mask1} />
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(BeardLight, optionValue);

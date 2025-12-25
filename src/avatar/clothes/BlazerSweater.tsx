@@ -1,15 +1,13 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class BlazerSweater extends React.Component {
-  static optionValue = 'BlazerSweater'
+const optionValue = 'BlazerSweater';
 
-  private path1 = uniqueId('react-path-')
-  private mask1 = uniqueId('react-mask-')
+function BlazerSweater() {
+  const path1 = useId();
+  const mask1 = useId();
 
-  render () {
-    const { path1, mask1 } = this
-    return (
+  return (
       <g
         id='Clothing/Blazer-+-Sweater'
         transform='translate(0.000000, 170.000000)'>
@@ -69,6 +67,7 @@ export default class BlazerSweater extends React.Component {
           fillRule='evenodd'
         />
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(BlazerSweater, optionValue);

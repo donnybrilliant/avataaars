@@ -1,36 +1,28 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HatColor from './HatColor'
+import FacialHair from './facialHair';
+import HatColor from './HatColor';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class WinterHat4 extends React.Component {
-  static optionValue = 'WinterHat4'
-  private filter1 = uniqueId('react-filter-')
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private mask3 = uniqueId('react-mask-')
-  private mask4 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
-  private path3 = uniqueId('react-path-')
-  private path4 = uniqueId('react-path-')
-  private path5 = uniqueId('react-path-')
+const optionValue = 'WinterHat4';
 
-  render () {
-    const {
-      filter1,
-      mask1,
-      mask2,
-      mask3,
-      mask4,
-      path1,
-      path2,
-      path3,
-      path4,
-      path5
-    } = this
-    return (
+interface Props {
+  children?: ReactNode;
+}
+
+function WinterHat4({ children }: Props) {
+  const filter1 = useId();
+  const mask1 = useId();
+  const mask2 = useId();
+  const mask3 = useId();
+  const mask4 = useId();
+  const path1 = useId();
+  const path2 = useId();
+  const path3 = useId();
+  const path4 = useId();
+  const path5 = useId();
+
+  return (
       <g id='Top'>
         <defs>
           <rect id={path5} x='0' y='0' width='264' height='280' />
@@ -113,15 +105,16 @@ export default class WinterHat4 extends React.Component {
             <use
               fill='black'
               fillOpacity='1'
-              filter={`url(#${path4})`}
+              filter={`url(#${filter1})`}
               xlinkHref={'#' + path4}
             />
             <use fill='#F4F4F4' fillRule='evenodd' xlinkHref={'#' + path4} />
           </g>
           <FacialHair />
-          {this.props.children}
+          {children}
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(WinterHat4, optionValue);

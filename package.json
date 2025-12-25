@@ -1,52 +1,59 @@
 {
   "name": "avataaars",
-  "version": "2.0.0",
-  "description": "React component for avataaars",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "3.0.0",
+  "description": "React 19-compatible component for avataaars with optional animation features",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "docs": "typedoc",
+    "docs:serve": "typedoc --watch",
+    "demo": "npm run build && cd demo && npm run dev",
+    "prepublishOnly": "npm run build && npm run lint"
   },
   "keywords": [
     "react",
-    "avatar"
+    "react18",
+    "react-18",
+    "react19",
+    "react-19",
+    "avatar",
+    "avataaars",
+    "animation",
+    "animated-avatar",
+    "avatar-generator"
   ],
-  "repository": "git@github.com:fangpenlin/avataaars.git",
-  "author": "Fang-Pen Lin <hello@fangpenlin.com>",
+  "repository": "git@github.com:donnybrilliant/avataaars.git",
+  "author": "Daniel Vier <daniel.vier@gmail.com>",
+  "contributors": [
+    "Daniel Vier <daniel.vier@gmail.com>",
+    "Fang-Pen Lin <hello@fangpenlin.com>",
+    "Pablo Stanley"
+  ],
   "license": "MIT",
   "peerDependencies": {
-    "react": "^17.0.0"
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
   },
   "devDependencies": {
-    "@types/react": "^17.0.0",
-    "import-sort-style-renke": "^4.2.0",
-    "tslint": "^6.1.3",
-    "tslint-config-standard": "^9.0.0",
-    "tslint-react": "^5.0.0",
-    "typescript": "^4.3.5"
-  },
-  "dependencies": {
-    "lodash": ">=4.17.21",
-    "prop-types": "^15.7.2"
-  },
-  "importSort": {
-    ".js, .jsx, .es6, .es": {
-      "parser": "babylon",
-      "style": "import-sort-style-renke"
-    },
-    ".ts, .tsx": {
-      "parser": "typescript",
-      "style": "import-sort-style-renke"
-    }
-  },
-  "prettier": {
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": false,
-    "singleQuote": true,
-    "jsxSingleQuote": true,
-    "trailingComma": "es5",
-    "bracketSpacing": true,
-    "jsxBracketSameLine": true
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3",
+    "typedoc": "^0.27.0",
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "typescript-eslint": "^8.50.1",
+    "globals": "^16.5.0"
   }
 }

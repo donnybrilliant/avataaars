@@ -1,20 +1,22 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HairColor from './HairColor'
+import FacialHair from './facialHair';
+import HairColor from './HairColor';
+import { withOptionValue } from '../../utils/optionValue';
+const optionValue = 'ShortHairShaggyMullet';
 
-export default class ShortHairShaggyMullet extends React.Component {
-  static optionValue = 'ShortHairShaggyMullet'
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
-  private path3 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const { mask1, mask2, path1, path2, path3 } = this
-    return (
+function ShortHairShaggyMullet({ children }: Props) {
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
+  const path3 = useId();
+
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path1} x='0' y='0' width='264' height='280' />
@@ -33,7 +35,7 @@ export default class ShortHairShaggyMullet extends React.Component {
         <g id='Mask' />
         <g id='Top/Short-Hair/Shaggy-Mullet' mask={`url(#${mask1})`}>
           <g transform='translate(-1.000000, 0.000000)'>
-            {this.props.children}
+            {children}
             <mask id={mask2} fill='white'>
               <use xlinkHref={'#' + path2} />
             </mask>
@@ -57,6 +59,8 @@ export default class ShortHairShaggyMullet extends React.Component {
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(ShortHairShaggyMullet, optionValue);

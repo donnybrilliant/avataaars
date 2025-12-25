@@ -1,13 +1,10 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId } from 'react';
+import { withOptionValue } from '../../../utils/optionValue';
 
-export default class Kurt extends React.Component {
-  static optionValue = 'Kurt'
+const optionValue = 'Kurt';
 
-  private filter1 = uniqueId('react-filter-')
-
-  render () {
-    const { filter1 } = this
+function Kurt() {
+  const filter1 = useId();
     return (
       <g
         id='Top/_Resources/Kurt'
@@ -65,6 +62,7 @@ export default class Kurt extends React.Component {
           />
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Kurt, optionValue);

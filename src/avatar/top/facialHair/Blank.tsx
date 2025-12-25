@@ -1,9 +1,8 @@
-import * as React from 'react'
+import { withOptionValue } from '../../../utils/optionValue';
+const optionValue = 'Blank';
 
-export default class Blank extends React.Component {
-  static optionValue = 'Blank'
-
-  render () {
-    return null
-  }
+function Blank() {
+  return null;
 }
+
+export default withOptionValue(Blank, optionValue);

@@ -1,17 +1,19 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
+import FacialHair from './facialHair';
+import { withOptionValue } from '../../utils/optionValue';
 
-export default class Eyepatch extends React.Component {
-  static optionValue = 'Eyepatch'
+const optionValue = 'Eyepatch';
 
-  private mask1 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
+interface Props {
+  children?: ReactNode;
+}
 
-  render () {
-    const { mask1, path1 } = this
-    return (
+function Eyepatch({ children }: Props) {
+  const mask1 = useId();
+  const path1 = useId();
+
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path1} x='0' y='0' width='264' height='280' />
@@ -29,9 +31,11 @@ export default class Eyepatch extends React.Component {
               fill='#28354B'
               fillRule='evenodd'
             />
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    );
 }
+
+export default withOptionValue(Eyepatch, optionValue);

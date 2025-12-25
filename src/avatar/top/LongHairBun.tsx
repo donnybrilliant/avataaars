@@ -1,20 +1,21 @@
-import * as React from 'react'
-import { uniqueId } from 'lodash'
+import { useId, type ReactNode } from 'react';
 
-import FacialHair from './facialHair'
-import HairColor from './HairColor'
+import FacialHair from './facialHair';
+import HairColor from './HairColor';
+import { withOptionValue } from '../../utils/optionValue';
+const optionValue = 'LongHairBun';
 
-export default class LongHairBun extends React.Component {
-  static optionValue = 'LongHairBun'
+interface Props {
+  children?: ReactNode;
+}
 
-  private mask1 = uniqueId('react-mask-')
-  private mask2 = uniqueId('react-mask-')
-  private path1 = uniqueId('react-path-')
-  private path2 = uniqueId('react-path-')
+function LongHairBun({ children }: Props) {
+  const mask1 = useId();
+  const mask2 = useId();
+  const path1 = useId();
+  const path2 = useId();
 
-  render () {
-    const { mask1, mask2, path1, path2 } = this
-    return (
+  return (
       <g id='Top' strokeWidth='1' fillRule='evenodd'>
         <defs>
           <rect id={path2} x='0' y='0' width='264' height='280' />
@@ -41,10 +42,12 @@ export default class LongHairBun extends React.Component {
               xlinkHref={'#' + path1}
             />
             <HairColor maskID={mask1} />
-            {this.props.children}
+            {children}
           </g>
         </g>
       </g>
-    )
-  }
+    
+    );
 }
+
+export default withOptionValue(LongHairBun, optionValue);
