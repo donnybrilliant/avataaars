@@ -13,7 +13,7 @@ export type {
   AvatarProps,
 } from "./avatarTypes";
 
-// Re-export option value types
+// Re-export option value types and constants from dist
 export type {
   TopType,
   AccessoriesType,
@@ -28,9 +28,8 @@ export type {
   EyebrowType,
   MouthType,
   SkinColor,
-} from "./optionValues";
+} from "../../dist";
 
-// Re-export option value constants
 export {
   TOP_TYPES,
   ACCESSORIES_TYPES,
@@ -45,5 +44,5 @@ export {
   EYEBROW_TYPES,
   MOUTH_TYPES,
   SKIN_COLORS,
-} from "./optionValues";
+} from "../../dist";
 
