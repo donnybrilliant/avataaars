@@ -1,14 +1,14 @@
 /**
  * Main Avatar component with animation features
- * 
+ *
  * This module provides the primary Avatar component for the avataaars library.
  * It supports optional animation features including:
  * - Idle animation: Random expression changes when not hovering
  * - Hover scale: Visual scaling effect on mouse hover
  * - Hover animation: Expression sequence animation on hover
- * 
+ *
  * All animation features are independent and can be combined as needed.
- * 
+ *
  * @module Avatar
  */
 
@@ -22,23 +22,15 @@ import {
 } from "react";
 
 import Avatar, { AvatarStyle } from "./avatar";
-import {
-  OptionContext,
-  allOptions,
-  OptionContextReact,
-} from "./options";
-import type {
-  AvatarProps,
-  HoverExpression,
-  OptionKey,
-} from "./types";
+import { OptionContext, allOptions, OptionContextReact } from "./options";
+import type { AvatarProps, HoverExpression, OptionKey } from "./types";
 
 // Re-export types from centralized location
 export type { AvatarProps as Props, HoverExpression, OptionKey } from "./types";
 export { AvatarStyle } from "./types";
 
-// Export option values
-export {
+// Import option values for validation and re-export
+import {
   TOP_TYPES,
   ACCESSORIES_TYPES,
   HAIR_COLORS,
@@ -66,6 +58,36 @@ export {
   type MouthType,
   type SkinColor,
 } from "./optionValues";
+
+// Re-export option values
+export {
+  TOP_TYPES,
+  ACCESSORIES_TYPES,
+  HAIR_COLORS,
+  HAT_COLORS,
+  FACIAL_HAIR_TYPES,
+  FACIAL_HAIR_COLORS,
+  CLOTHE_TYPES,
+  CLOTHE_COLORS,
+  GRAPHIC_TYPES,
+  EYE_TYPES,
+  EYEBROW_TYPES,
+  MOUTH_TYPES,
+  SKIN_COLORS,
+  type TopType,
+  type AccessoriesType,
+  type HairColor,
+  type HatColor,
+  type FacialHairType,
+  type FacialHairColor,
+  type ClotheType,
+  type ClotheColor,
+  type GraphicType,
+  type EyeType,
+  type EyebrowType,
+  type MouthType,
+  type SkinColor,
+};
 
 import { default as PieceComponent } from "./avatar/piece";
 
@@ -104,19 +126,19 @@ interface ExpressionToRestore {
 
 /**
  * Main Avatar component with optional animation features.
- * 
+ *
  * This component renders an avatar with support for:
  * - Customizable appearance through props
  * - Optional idle animation (random expression changes)
  * - Optional hover scale effect
  * - Optional hover animation sequence
- * 
+ *
  * Animation features are independent and can be combined. The component
  * automatically manages state transitions and cleanup.
- * 
+ *
  * @param props - Avatar configuration and animation settings
  * @returns React component rendering the avatar
- * 
+ *
  * @example
  * ```tsx
  * <AvatarComponent
@@ -131,20 +153,62 @@ interface ExpressionToRestore {
 export default function AvatarComponent(props: AvatarProps) {
   // Create option context instance (memoized to persist across renders)
   const optionContext = useMemo(() => new OptionContext(allOptions), []);
-  
+
   // Track previous props to detect changes
   const prevPropsRef = useRef<AvatarProps>({} as AvatarProps);
-  
+
   // Prevent duplicate initialization
   const isInitializedRef = useRef(false);
-  
+
   // Unique mask ID for SVG masking (React 19 useId hook)
   const maskId = useId();
+
+  // Ref to container div to get parent's background color
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [parentBackgroundColor, setParentBackgroundColor] =
+    useState<string>("#ffffff");
+
+  /**
+   * Validation map for option values.
+   * Maps option keys to their valid value arrays.
+   */
+  const OPTION_VALIDATION_MAP: Record<OptionKey, readonly string[]> = useMemo(
+    () => ({
+      topType: TOP_TYPES,
+      accessoriesType: ACCESSORIES_TYPES,
+      hairColor: HAIR_COLORS,
+      hatColor: HAT_COLORS,
+      facialHairType: FACIAL_HAIR_TYPES,
+      facialHairColor: FACIAL_HAIR_COLORS,
+      clotheType: CLOTHE_TYPES,
+      clotheColor: CLOTHE_COLORS,
+      graphicType: GRAPHIC_TYPES,
+      eyeType: EYE_TYPES,
+      eyebrowType: EYEBROW_TYPES,
+      mouthType: MOUTH_TYPES,
+      skinColor: SKIN_COLORS,
+    }),
+    []
+  );
+
+  /**
+   * Validates an option value against its allowed values.
+   * Returns the value if valid, undefined otherwise.
+   */
+  const validateOptionValue = useCallback(
+    (key: OptionKey, value: string | undefined): string | undefined => {
+      if (!value || typeof value !== "string") return undefined;
+      const validValues = OPTION_VALIDATION_MAP[key];
+      return validValues.includes(value) ? value : undefined;
+    },
+    [OPTION_VALIDATION_MAP]
+  );
 
   /**
    * Initialize option context with props on first render.
    * This ensures all provided prop values are set in the option context
    * before the avatar renders.
+   * Validates option values against allowed values.
    */
   useEffect(() => {
     if (isInitializedRef.current) return;
@@ -153,43 +217,50 @@ export default function AvatarComponent(props: AvatarProps) {
     for (const key of ALL_OPTION_KEYS) {
       const value = props[key];
       if (value && typeof value === "string") {
-        optionContext.setValue(key, value);
+        const validatedValue = validateOptionValue(key, value);
+        if (validatedValue) {
+          optionContext.setValue(key, validatedValue);
+        }
       }
     }
     // Initialize prevPropsRef after setting values
     prevPropsRef.current = { ...props };
-  }, [props, optionContext]);
+  }, [props, optionContext, validateOptionValue]);
 
   // Animation state management
   // These state values override props when animations are active
   const [mouth, setMouth] = useState<string | null>(null);
   const [eyes, setEyes] = useState<string | null>(null);
   const [eyebrow, setEyebrow] = useState<string | null>(null);
-  
+
   // Hover state tracking
   const [isHovered, setIsHovered] = useState(false);
   const [isMouseHovered, setIsMouseHovered] = useState(false);
-  
+
   // Timer references for animation scheduling and cleanup
-  const animationIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animationIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
   const hoverIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const restoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const restoreSequenceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+  const restoreSequenceTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+
   // State preservation for animation transitions
   const savedStateRef = useRef<{
     mouth: string;
     eyes: string;
     eyebrow: string;
   } | null>(null);
-  
+
   // Original prop values for restoration after hover animations
   const originalPropsRef = useRef<{
     eyeType?: string;
     eyebrowType?: string;
     mouthType?: string;
   } | null>(null);
-  
+
   // Prevent duplicate animation scheduling
   const isSchedulingRef = useRef(false);
 
@@ -235,6 +306,37 @@ export default function AvatarComponent(props: AvatarProps) {
     ...restProps
   } = props;
 
+  // Get parent element's background color
+  useEffect(() => {
+    if (containerRef.current?.parentElement) {
+      const parent = containerRef.current.parentElement;
+      const computedStyle = window.getComputedStyle(parent);
+      let bgColor = computedStyle.backgroundColor;
+
+      // If background is transparent, walk up the DOM tree to find a non-transparent background
+      if (bgColor === "rgba(0, 0, 0, 0)" || bgColor === "transparent") {
+        let current: HTMLElement | null = parent.parentElement;
+        while (current) {
+          const style = window.getComputedStyle(current);
+          const currentBg = style.backgroundColor;
+          if (currentBg !== "rgba(0, 0, 0, 0)" && currentBg !== "transparent") {
+            bgColor = currentBg;
+            break;
+          }
+          current = current.parentElement;
+        }
+        // If still transparent, fall back to backgroundColor prop or white
+        if (bgColor === "rgba(0, 0, 0, 0)" || bgColor === "transparent") {
+          bgColor = backgroundColor || "#ffffff";
+        }
+      }
+      setParentBackgroundColor(bgColor);
+    } else {
+      // Fallback to backgroundColor prop or white if no parent
+      setParentBackgroundColor(backgroundColor || "#ffffff");
+    }
+  }, [backgroundColor]);
+
   /**
    * Validate and clamp animation parameters to safe ranges.
    * This prevents performance issues and ensures smooth animations.
@@ -244,7 +346,10 @@ export default function AvatarComponent(props: AvatarProps) {
     ? Math.max(500, Math.min(3000, rawAnimationSpeed))
     : undefined;
   // Hover animation speed: 100-2000ms
-  const hoverAnimationSpeed = Math.max(100, Math.min(2000, rawHoverAnimationSpeed));
+  const hoverAnimationSpeed = Math.max(
+    100,
+    Math.min(2000, rawHoverAnimationSpeed)
+  );
   // Hover scale: 1.05-1.32 (prevents excessive scaling)
   const hoverScale = rawHoverScale
     ? Math.max(1.05, Math.min(1.32, rawHoverScale))
@@ -254,6 +359,7 @@ export default function AvatarComponent(props: AvatarProps) {
    * Update option context when props change.
    * This keeps the option context in sync with component props,
    * enabling child components to react to prop changes.
+   * Validates option values against allowed values.
    */
   useEffect(() => {
     const prevProps = prevPropsRef.current;
@@ -263,13 +369,16 @@ export default function AvatarComponent(props: AvatarProps) {
       // Update if value is a string and either it's different from previous or it's a new prop
       if (value && typeof value === "string") {
         if (value !== prevProps[key] || prevProps[key] === undefined) {
-          optionContext.setValue(key, value);
+          const validatedValue = validateOptionValue(key, value);
+          if (validatedValue) {
+            optionContext.setValue(key, validatedValue);
+          }
         }
       }
     }
 
     prevPropsRef.current = { ...props };
-  }, [props, optionContext]);
+  }, [props, optionContext, validateOptionValue]);
 
   /**
    * Feature detection flags.
@@ -319,7 +428,7 @@ export default function AvatarComponent(props: AvatarProps) {
   /**
    * Get available expression options for animation.
    * Returns the list of valid values for each expression type.
-   * 
+   *
    * @param key - The expression type to get options for
    * @returns Array of valid expression values
    */
@@ -426,7 +535,7 @@ export default function AvatarComponent(props: AvatarProps) {
    * Schedule the next idle animation change.
    * Uses a randomized delay based on animationSpeed to create natural timing.
    * The delay is calculated as: baseDelay (1000-2000ms) * (speed / 2000)
-   * 
+   *
    * Examples:
    * - animationSpeed=2000: base delay (1000-2000ms) - natural idle animation
    * - animationSpeed=4000: 2x delay (2000-4000ms) - slower, more subtle
@@ -474,7 +583,7 @@ export default function AvatarComponent(props: AvatarProps) {
    * Get the default hover animation sequence.
    * Returns a predefined sequence of expressions for hover animations.
    * Can be overridden by providing a custom hoverSequence prop.
-   * 
+   *
    * @returns Default sequence of hover expressions
    */
   const getDefaultHoverSequence = useCallback(
@@ -645,7 +754,7 @@ export default function AvatarComponent(props: AvatarProps) {
        * Restore state after hover animation.
        * If idle animation is enabled, restore to saved state and resume idle animation.
        * Otherwise, restore to original prop values.
-       * 
+       *
        * Keep isHovered true during restore so state values are used,
        * then set to false at the end to allow props to take precedence.
        */
@@ -937,10 +1046,57 @@ export default function AvatarComponent(props: AvatarProps) {
   /**
    * Circle geometry constants for mask calculations.
    * These define the circle position and size for the avatar.
+   * Base dimensions are 264x280 (the SVG viewBox).
    */
+  const baseWidth = 264;
+  const baseHeight = 280;
   const r = 120; // Circle radius
   const cx = 132; // Circle center X
   const cy = 160; // Circle center Y
+
+  /**
+   * Extract width and height from style prop, or use defaults.
+   * Calculate scale factors to maintain aspect ratio.
+   * Validates that width and height are positive numbers.
+   */
+  let containerWidth = baseWidth;
+  let containerHeight = baseHeight;
+  let widthScale = 1;
+  let heightScale = 1;
+
+  if (style) {
+    if (style.width) {
+      let parsedWidth: number | undefined;
+      if (typeof style.width === "number") {
+        parsedWidth = style.width;
+      } else if (typeof style.width === "string") {
+        parsedWidth = parseFloat(style.width);
+      }
+      // Validate: must be a valid number, positive, and not zero
+      if (parsedWidth !== undefined && !isNaN(parsedWidth) && parsedWidth > 0) {
+        containerWidth = parsedWidth;
+      }
+    }
+    if (style.height) {
+      let parsedHeight: number | undefined;
+      if (typeof style.height === "number") {
+        parsedHeight = style.height;
+      } else if (typeof style.height === "string") {
+        parsedHeight = parseFloat(style.height);
+      }
+      // Validate: must be a valid number, positive, and not zero
+      if (
+        parsedHeight !== undefined &&
+        !isNaN(parsedHeight) &&
+        parsedHeight > 0
+      ) {
+        containerHeight = parsedHeight;
+      }
+    }
+    // Calculate scale factors
+    widthScale = containerWidth / baseWidth;
+    heightScale = containerHeight / baseHeight;
+  }
 
   /**
    * Core avatar element wrapped in option context provider.
@@ -961,14 +1117,22 @@ export default function AvatarComponent(props: AvatarProps) {
    * - Hover event handlers (if needed)
    */
   if (needsAnimationContainer) {
+    // Scale circle and mask coordinates based on container size
+    // Use min scale to keep circle circular (maintain aspect ratio)
+    const scale = Math.min(widthScale, heightScale);
+    const scaledR = r * scale;
+    const scaledCx = cx * widthScale;
+    const scaledCy = cy * heightScale;
+
     return (
       <div
+        ref={containerRef}
         style={{
           position: "relative",
           display: "inline-block",
           cursor: "default",
-          width: 264,
-          height: 280,
+          width: containerWidth,
+          height: containerHeight,
           overflow: "visible",
         }}
         onMouseEnter={needsHoverHandlers ? handleMouseEnter : undefined}
@@ -978,10 +1142,10 @@ export default function AvatarComponent(props: AvatarProps) {
           <div
             style={{
               position: "absolute",
-              left: cx - r,
-              top: cy - r,
-              width: r * 2,
-              height: r * 2,
+              left: scaledCx - scaledR,
+              top: scaledCy - scaledR,
+              width: scaledR * 2,
+              height: scaledR * 2,
               borderRadius: "50%",
               backgroundColor,
               zIndex: 0,
@@ -993,8 +1157,8 @@ export default function AvatarComponent(props: AvatarProps) {
             position: "absolute",
             top: 0,
             left: 0,
-            width: 264,
-            height: 280,
+            width: containerWidth,
+            height: containerHeight,
             zIndex: 1,
             transition: "transform 0.3s ease-in-out",
             transform:
@@ -1006,50 +1170,58 @@ export default function AvatarComponent(props: AvatarProps) {
         >
           {avatarElement}
         </div>
-        {isCircle && (
+        {isCircle && hasHoverScale && (
           <svg
-            width="264"
-            height="280"
-            viewBox="0 0 264 280"
+            width={containerWidth}
+            height={containerHeight}
+            viewBox={`0 0 ${baseWidth} ${baseHeight}`}
             style={{
               position: "absolute",
               top: "0px",
               left: "0px",
               zIndex: 2,
               pointerEvents: "none",
+              overflow: "visible",
             }}
           >
             <defs>
               <mask id={maskId}>
                 {/**
-                  * SVG Mask for circle overflow clipping.
-                  * Mask logic: White = opaque (hides), Black = transparent (shows through)
-                  * Start with everything black (transparent) to show through,
-                  * then add white (opaque) areas to hide overflow outside the circle.
-                  */}
+                 * SVG Mask for circle overflow clipping.
+                 * Mask logic: White = opaque (hides), Black = transparent (shows through)
+                 * Start with everything black (transparent) to show through,
+                 * then add white (opaque) areas to hide overflow outside the circle.
+                 * Coordinates are in viewBox space (0 0 264 280), so they scale automatically.
+                 */}
                 <rect width="100%" height="100%" fill="black" />
-                {/* Left side overflow (bottom half only) */}
+                {/* Left side overflow (bottom half only) - same width as bottom rect, no hover scaling */}
                 <rect
-                  x="0"
-                  y={cy}
-                  width={cx - r}
-                  height={280 - cy}
+                  x="-2"
+                  y={cy + (baseHeight - cy) / 2}
+                  width={cx - r + 12}
+                  height={(baseHeight - cy) / 2}
                   fill="white"
                 />
-                {/* Right side overflow (bottom half only) */}
+                {/* Right side overflow (bottom half only) - same width as bottom rect, no hover scaling */}
                 <rect
-                  x={cx + r}
-                  y={cy}
-                  width={264 - (cx + r)}
-                  height={280 - cy}
+                  x={cx + r - 12}
+                  y={cy + (baseHeight - cy) / 2}
+                  width={baseWidth + 2 - (cx + r - 12)}
+                  height={(baseHeight - cy) / 2}
                   fill="white"
                 />
-                {/* Bottom overflow (below circle bottom) */}
+                {/* Bottom overflow (below circle bottom only) - grows downward on hover, starts at circle bottom, extends to bottom edge */}
                 <rect
-                  x={cx - r}
+                  x="-2"
                   y={cy + r}
-                  width={r * 2}
-                  height={280 - (cy + r)}
+                  width={baseWidth + 4}
+                  height={
+                    Math.max(1, baseHeight - (cy + r)) +
+                    2 +
+                    (isMouseHovered && hasHoverScale
+                      ? ((hoverScale ?? 1.2) - 1) * (baseHeight - (cy + r)) + 1
+                      : 0)
+                  }
                   fill="white"
                 />
                 {/* Bottom half circle overflow - left crescent */}
@@ -1069,14 +1241,16 @@ export default function AvatarComponent(props: AvatarProps) {
               </mask>
             </defs>
             {/**
-              * White rect with mask applied.
-              * Covers overflow outside circle (opaque), transparent inside circle.
-              * This creates the circular clipping effect.
-              */}
+             * Rect with mask applied, using the parent element's background color.
+             * Covers overflow outside circle (opaque), transparent inside circle.
+             * This creates the circular clipping effect that blends with the parent background.
+             */}
             <rect
-              width="100%"
-              height="100%"
-              fill="white"
+              x="-2"
+              y="-2"
+              width={baseWidth + 4}
+              height={baseHeight + 4}
+              fill={parentBackgroundColor}
               mask={`url(#${maskId})`}
             />
           </svg>
@@ -1094,13 +1268,13 @@ export default function AvatarComponent(props: AvatarProps) {
 
 /**
  * Piece component for rendering individual avatar pieces.
- * 
+ *
  * This component is used for rendering specific parts of the avatar
  * (e.g., for avatar builders or piece-by-piece rendering).
- * 
+ *
  * @param props - Avatar configuration props
  * @returns React component rendering the specified avatar piece
- * 
+ *
  * @example
  * ```tsx
  * <Piece
