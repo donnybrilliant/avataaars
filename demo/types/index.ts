@@ -1,6 +1,6 @@
 /**
  * Centralized type exports for the demo application
- * 
+ *
  * This file serves as the single source of truth for all types used in the demo.
  * Import types from here for consistency and easier maintenance.
  */
@@ -13,7 +13,7 @@ export type {
   AvatarProps,
 } from "./avatarTypes";
 
-// Re-export option value types and constants from dist
+// Re-export option value types and constants from npm package
 export type {
   TopType,
   AccessoriesType,
@@ -28,7 +28,7 @@ export type {
   EyebrowType,
   MouthType,
   SkinColor,
-} from "../../dist";
+} from "@vierweb/avataaars";
 
 export {
   TOP_TYPES,
@@ -44,5 +44,4 @@ export {
   EYEBROW_TYPES,
   MOUTH_TYPES,
   SKIN_COLORS,
-} from "../../dist";
-
+} from "@vierweb/avataaars";

@@ -1,4 +1,4 @@
-import type { Props as AvatarProps, HoverExpression } from "../../dist/index";
+import type { Props as AvatarProps, HoverExpression } from "@vierweb/avataaars";
 
 /**
  * Avatar customization props (subset of AvatarProps with required fields)
@@ -44,7 +44,7 @@ export interface AvatarSettings {
 }
 
 /**
- * Re-export types from dist for convenience
+ * Re-export types from npm package for convenience
  */
 export type { HoverExpression };
-export type { Props as AvatarProps } from "../../dist/index";
+export type { Props as AvatarProps } from "@vierweb/avataaars";

@@ -1,8 +1,8 @@
 import { GIFEncoder, quantize, applyPalette } from "gifenc";
 import { createRoot } from "react-dom/client";
 import React, { type CSSProperties } from "react";
-import AvatarComponent, { AvatarStyle } from "../../dist/index";
-import { HoverExpression } from "../../dist/index";
+import AvatarComponent, { AvatarStyle } from "@vierweb/avataaars";
+import { HoverExpression } from "@vierweb/avataaars";
 
 /**
  * Exports an animated SVG file containing multiple expression frames.

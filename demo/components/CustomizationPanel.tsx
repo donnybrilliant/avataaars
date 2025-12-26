@@ -13,7 +13,7 @@ import {
   EyebrowOption,
   MouthOption,
   SkinOption,
-} from "../../dist/options";
+} from "@vierweb/avataaars/options";
 import type { AvatarCustomizationProps } from "../types/avatarTypes";
 import {
   TOP_TYPES,
@@ -29,7 +29,7 @@ import {
   EYEBROW_TYPES,
   MOUTH_TYPES,
   SKIN_COLORS,
-} from "../../dist";
+} from "@vierweb/avataaars";
 
 /**
  * Top types that represent hats (used for conditional hatColor display)
