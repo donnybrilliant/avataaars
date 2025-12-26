@@ -200,35 +200,78 @@ export default function ExportDropdown({
             overflow: "hidden",
           }}
         >
-          {!idleAnimationEnabled && (
-            <button
-              onClick={handleExportPNG}
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                backgroundColor: "transparent",
-                color: "#333",
-                border: "none",
-                textAlign: "left",
-                cursor: "pointer",
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                transition: "background-color 0.2s",
-              }}
-              onMouseEnter={(e) => {
+          <button
+            onClick={handleExportPNG}
+            disabled={idleAnimationEnabled}
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              backgroundColor: "transparent",
+              color: idleAnimationEnabled ? "#999" : "#333",
+              border: "none",
+              textAlign: "left",
+              cursor: idleAnimationEnabled ? "not-allowed" : "pointer",
+              fontSize: "14px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              gap: "4px",
+              transition: "background-color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              if (!idleAnimationEnabled) {
                 e.currentTarget.style.backgroundColor = "#f5f5f5";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
+            title={
+              idleAnimationEnabled
+                ? "Disable idle animation to export PNG"
+                : "Export static avatar as PNG"
+            }
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "auto 1fr",
+                gap: "8px 8px",
+                width: "100%",
+                alignItems: "center",
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
-              title="Export static avatar as PNG (only available when idle animation is disabled)"
             >
-              <span>🖼️</span>
-              <span>Export to PNG</span>
-            </button>
-          )}
+              <span
+                style={{
+                  gridRow: "1",
+                  gridColumn: "1",
+                }}
+              >
+                🖼️
+              </span>
+              <span
+                style={{
+                  gridRow: "1",
+                  gridColumn: "2",
+                }}
+              >
+                Export to PNG
+              </span>
+              {idleAnimationEnabled && (
+                <span
+                  style={{
+                    gridRow: "2",
+                    gridColumn: "1 / span 2",
+                    fontSize: "10px",
+                    color: "#999",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Disable idle animation to enable
+                </span>
+              )}
+            </div>
+          </button>
           <button
             onClick={handleExportGIF}
             disabled={!expressions.length}
@@ -238,7 +281,7 @@ export default function ExportDropdown({
               backgroundColor: "transparent",
               color: expressions.length ? "#333" : "#999",
               border: "none",
-              borderTop: !idleAnimationEnabled ? "1px solid #eee" : "none",
+              borderTop: "1px solid #eee",
               textAlign: "left",
               cursor: expressions.length ? "pointer" : "not-allowed",
               fontSize: "14px",

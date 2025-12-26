@@ -85,6 +85,25 @@ function App() {
     loadFromStorage(STORAGE_KEYS.settings, defaultSettings)
   );
 
+  const [maxWidth, setMaxWidth] = useState(600);
+
+  // Calculate responsive max width based on viewport
+  useEffect(() => {
+    const calculateMaxWidth = () => {
+      const viewportWidth = window.innerWidth;
+      const padding = 200; // Account for container padding and controls
+      const calculatedMax = Math.min(
+        600,
+        Math.max(100, viewportWidth - padding)
+      );
+      setMaxWidth(calculatedMax);
+    };
+
+    calculateMaxWidth();
+    window.addEventListener("resize", calculateMaxWidth);
+    return () => window.removeEventListener("resize", calculateMaxWidth);
+  }, []);
+
   /**
    * Debounced save function for settings that are controlled by sliders.
    * This prevents excessive localStorage writes during slider drag operations.
@@ -165,24 +184,140 @@ function App() {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          flexDirection: "row-reverse",
+          justifyContent: "flex-end",
+          alignItems: "flex-start",
+          gap: "15px",
           marginBottom: "10px",
+          flexWrap: "wrap",
         }}
       >
-        <h1 style={{ margin: 0, color: "#1a1a1a" }}>🎨 Avataaars Demo</h1>
-        <ExportDropdown
-          avatarProps={props}
-          expressions={settings.hoverSequence}
-          frameDelay={settings.hoverAnimationSpeed}
-          backgroundColor={settings.backgroundColor}
-          idleAnimationEnabled={settings.idleAnimationEnabled}
-          width={settings.width}
-        />
+        <div style={{ alignSelf: "flex-end", marginLeft: "auto" }}>
+          <ExportDropdown
+            avatarProps={props}
+            expressions={settings.hoverSequence}
+            frameDelay={settings.hoverAnimationSpeed}
+            backgroundColor={settings.backgroundColor}
+            idleAnimationEnabled={settings.idleAnimationEnabled}
+            width={settings.width}
+          />
+        </div>
+        <h1
+          style={{
+            margin: 0,
+            color: "#1a1a1a",
+            fontSize: "clamp(20px, 4vw + 12px, 32px)",
+            flex: "1 1 auto",
+            minWidth: "200px",
+          }}
+        >
+          🎨 Avataaars Demo
+        </h1>
       </div>
-      <p style={{ color: "#666", marginBottom: "30px" }}>
+      <p
+        style={{
+          color: "#666",
+          marginBottom: "15px",
+          fontSize: "clamp(12px, 2vw + 8px, 16px)",
+        }}
+      >
         Customize your avatar with all available options
       </p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          gap: "10px",
+          marginBottom: "30px",
+          flexWrap: "wrap",
+        }}
+      >
+        <label
+          style={{
+            fontSize: "clamp(12px, 2vw + 6px, 14px)",
+            fontWeight: 500,
+            color: "#555",
+            whiteSpace: "nowrap",
+          }}
+        >
+          📏 Width:
+        </label>
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            alignItems: "center",
+            flex: "1 1 auto",
+            minWidth: "200px",
+          }}
+        >
+          <input
+            type="range"
+            min="100"
+            max={maxWidth}
+            step="10"
+            value={Math.min(settings.width, maxWidth)}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              if (!isNaN(value)) {
+                const clampedValue = Math.max(100, Math.min(maxWidth, value));
+                updateSetting("width", clampedValue, true);
+              }
+            }}
+            style={{
+              flex: "1 1 auto",
+              minWidth: "100px",
+              maxWidth: "300px",
+              boxSizing: "border-box",
+            }}
+          />
+          <div
+            style={{
+              position: "relative",
+              display: "inline-block",
+              flexShrink: 0,
+            }}
+          >
+            <input
+              type="number"
+              min="100"
+              max="800"
+              step="10"
+              value={settings.width}
+              onChange={(e) => {
+                const value = parseInt(e.target.value, 10);
+                if (!isNaN(value)) {
+                  const clampedValue = Math.max(100, Math.min(800, value));
+                  updateSetting("width", clampedValue, false);
+                }
+              }}
+              style={{
+                width: "clamp(80px, 10vw, 100px)",
+                padding: "6px 24px 6px 8px",
+                border: "1px solid #ddd",
+                borderRadius: "6px",
+                fontSize: "clamp(12px, 2vw + 4px, 14px)",
+                boxSizing: "border-box",
+              }}
+              title="Export width (up to 800px for high-res exports)"
+            />
+            <span
+              style={{
+                position: "absolute",
+                right: "8px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: "clamp(11px, 2vw + 3px, 14px)",
+                color: "#666",
+                pointerEvents: "none",
+              }}
+            >
+              px
+            </span>
+          </div>
+        </div>
+      </div>
 
       <AvatarPreview props={props} settings={settings} />
 
