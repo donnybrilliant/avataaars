@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { AvatarStyle } from "../dist/index";
+import { AvatarStyle } from "@vierweb/avataaars";
 import type {
   AvatarCustomizationProps,
   AvatarSettings,
@@ -169,14 +169,13 @@ function App() {
           marginBottom: "10px",
         }}
       >
-        <h1 style={{ margin: 0, color: "#1a1a1a" }}>
-          🎨 Avataaars Component Demo
-        </h1>
+        <h1 style={{ margin: 0, color: "#1a1a1a" }}>🎨 Avataaars Demo</h1>
         <ExportDropdown
           avatarProps={props}
           expressions={settings.hoverSequence}
           frameDelay={settings.hoverAnimationSpeed}
           backgroundColor={settings.backgroundColor}
+          idleAnimationEnabled={settings.idleAnimationEnabled}
         />
       </div>
       <p style={{ color: "#666", marginBottom: "30px" }}>

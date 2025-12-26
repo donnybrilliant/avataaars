@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AvatarStyle } from "../../dist/index";
+import { AvatarStyle } from "@vierweb/avataaars";
 import type {
   AvatarSettings,
   AvatarCustomizationProps,

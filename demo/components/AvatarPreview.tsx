@@ -1,9 +1,9 @@
-import Avatar from "../../dist/index";
+import Avatar from "@vierweb/avataaars";
 import type {
   AvatarCustomizationProps,
   AvatarSettings,
 } from "../types/avatarTypes";
-import type { Props as AvatarProps } from "../../dist/index";
+import type { Props as AvatarProps } from "@vierweb/avataaars";
 
 interface AvatarPreviewProps {
   props: AvatarCustomizationProps;
