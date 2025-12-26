@@ -11,6 +11,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Future features and improvements will be documented here.
 
+## [3.0.3] - 2025-01-XX
+
+### Added
+
+- **Input Validation**: Added runtime validation for avatar props
+  - `style.width` and `style.height` now validate for positive, non-zero values
+  - Option props (`topType`, `eyeType`, `mouthType`, etc.) now validate against available option values
+  - Invalid values are silently ignored and fall back to defaults
+- **Automatic Background Color Detection**: Mask now automatically detects and uses parent container's background color
+  - No manual configuration needed - seamlessly blends with any background
+  - Falls back to `backgroundColor` prop or white if parent background is transparent
+
+### Changed
+
+- **Mask Improvements**: Enhanced circle mask for better overflow handling
+  - Mask now properly scales with avatar size
+  - Improved gap handling at different sizes
+  - Mask dynamically adjusts on hover when `hoverScale` is enabled
+- **Width/Height Scaling**: Avatar now properly scales circle background and mask based on `style.width` and `style.height` props
+  - Maintains aspect ratio automatically
+  - Circle and mask scale proportionally with avatar size
+
+### Fixed
+
+- Fixed mask gaps that appeared at certain sizes
+- Fixed mask not following circle edge properly
+- Fixed validation warnings for React hooks dependencies
+
 ## [3.0.2] - 2024-12-26
 
 ### Fixed
