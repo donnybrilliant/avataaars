@@ -45,6 +45,7 @@ const defaultSettings: AvatarSettings = {
     { mouth: "Vomit", eyes: "Close", eyebrow: "SadConcerned" },
     { mouth: "Grimace", eyes: "EyeRoll", eyebrow: "UnibrowNatural" },
   ],
+  width: 300,
 };
 
 /**
@@ -176,6 +177,7 @@ function App() {
           frameDelay={settings.hoverAnimationSpeed}
           backgroundColor={settings.backgroundColor}
           idleAnimationEnabled={settings.idleAnimationEnabled}
+          width={settings.width}
         />
       </div>
       <p style={{ color: "#666", marginBottom: "30px" }}>

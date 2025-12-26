@@ -41,6 +41,7 @@ export interface AvatarSettings {
   hoverAnimationEnabled: boolean;
   hoverScaleEnabled: boolean;
   hoverSequence: HoverExpression[];
+  width: number;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AvatarStyle } from "@vierweb/avataaars";
 import type {
   AvatarSettings,
@@ -73,6 +73,24 @@ export default function SettingsPanel({
   onSettingChange,
 }: SettingsPanelProps) {
   const [isHoverSequenceExpanded, setIsHoverSequenceExpanded] = useState(false);
+  const [maxWidth, setMaxWidth] = useState(600);
+
+  // Calculate responsive max width based on viewport
+  useEffect(() => {
+    const calculateMaxWidth = () => {
+      // Get viewport width, accounting for padding (40px on each side = 80px total)
+      // Also account for the preview container padding (40px on each side = 80px total)
+      // Total padding to account for: ~160px
+      const viewportWidth = window.innerWidth;
+      const padding = 160; // Total padding from container and preview
+      const calculatedMax = Math.min(600, Math.max(100, viewportWidth - padding));
+      setMaxWidth(calculatedMax);
+    };
+
+    calculateMaxWidth();
+    window.addEventListener("resize", calculateMaxWidth);
+    return () => window.removeEventListener("resize", calculateMaxWidth);
+  }, []);
 
   /**
    * Generic slider update handler that clamps values within specified bounds.
@@ -106,6 +124,10 @@ export default function SettingsPanel({
 
   const updateHoverAnimationSpeed = (value: string) => {
     handleSliderChange(value, 100, 2000, "hoverAnimationSpeed", parseInt);
+  };
+
+  const updateWidth = (value: string) => {
+    handleSliderChange(value, 100, maxWidth, "width", parseInt);
   };
 
   /**
@@ -162,13 +184,13 @@ export default function SettingsPanel({
         ⚙️ Settings
       </h2>
 
-      {/* Avatar Style and Background Color - stack on smaller screens */}
+      {/* Avatar Style, Background Color, and Width - same grid as animation features */}
       <div
+        className="animation-sliders-grid"
         style={{
           display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(min(200px, 100%), 1fr))",
-          gap: "clamp(10px, 2vw, 20px)",
+          gridTemplateColumns: "repeat(3, minmax(160px, 1fr))",
+          gap: "clamp(15px, 2vw, 25px)",
           marginBottom: "30px",
         }}
       >
@@ -232,6 +254,72 @@ export default function SettingsPanel({
               boxSizing: "border-box",
             }}
           />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: 500,
+              color: "#555",
+            }}
+          >
+            📏 Width: {settings.width}px
+          </label>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              alignItems: "center",
+            }}
+          >
+            <input
+              type="range"
+              min="100"
+              max={maxWidth}
+              step="10"
+              value={Math.min(settings.width, maxWidth)}
+              onChange={(e) => updateWidth(e.target.value)}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                boxSizing: "border-box",
+              }}
+            />
+            <input
+              type="number"
+              min="100"
+              max="800"
+              step="10"
+              value={settings.width}
+              onChange={(e) => {
+                const value = parseInt(e.target.value, 10);
+                if (!isNaN(value)) {
+                  const clampedValue = Math.max(100, Math.min(800, value));
+                  onSettingChange("width", clampedValue, false);
+                }
+              }}
+              style={{
+                width: "80px",
+                padding: "8px",
+                border: "1px solid #ddd",
+                borderRadius: "6px",
+                fontSize: "14px",
+                boxSizing: "border-box",
+              }}
+              title="Export width (up to 800px for high-res exports)"
+            />
+          </div>
+          <div
+            style={{
+              fontSize: "11px",
+              color: "#999",
+              marginTop: "4px",
+            }}
+          >
+            Preview limited to {maxWidth}px • Export up to 800px
+          </div>
         </div>
       </div>
 
