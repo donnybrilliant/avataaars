@@ -1,5 +1,8 @@
 # React component for Avataaars
 
+[![Publish to NPM](https://github.com/donnybrilliant/avataaars/actions/workflows/publish.yml/badge.svg)](https://github.com/donnybrilliant/avataaars/actions/workflows/publish.yml)
+[![Deploy to GitHub Pages](https://github.com/donnybrilliant/avataaars/actions/workflows/deploy.yml/badge.svg)](https://github.com/donnybrilliant/avataaars/actions/workflows/deploy.yml)
+
 The core React component for [Avataaars Generator](https://getavataaars.com/) developed by [Fang-Pen Lin](https://twitter.com/fangpenlin), based on the Sketch library [Avataaars](https://avataaars.com/) designed by [Pablo Stanley](https://twitter.com/pablostanley).
 
 <p align="center"><img src='avatar.svg' style='width: 300px; height: 300px;' /></p>

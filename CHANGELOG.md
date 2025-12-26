@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Future features and improvements will be documented here.
 
+## [3.0.1] - 2025-12-26
+
+### Added
+
+- **Options Module Export**: Added `./options` export path to package.json
+  - Users can now import options from `@vierweb/avataaars/options`
+  - Enables importing individual option objects (TopOption, EyesOption, etc.) and option constants
+  - Example: `import { TopOption, EyesOption } from '@vierweb/avataaars/options'`
+
+### Changed
+
+- **Demo Updates**: Demo now uses the published npm package instead of local dist folder
+  - Demo package.json updated to use `@vierweb/avataaars` as a dependency
+  - All imports updated from local paths to npm package imports
+  - Added installation instructions code block in CodeGenerator component
+
 ## [3.0.0] - 2024-12-26
 
 ### Added
