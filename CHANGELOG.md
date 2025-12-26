@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed missing dropdown options for Hair Color, Facial Hair Color, Skin Color, and Clothe Color in demo applications
+- Added missing `./options` export path to package.json exports field to support `@vierweb/avataaars/options` imports
+- Exported individual color components from color modules to enable proper option value extraction
+
 ### Added
 
 - Future features and improvements will be documented here.

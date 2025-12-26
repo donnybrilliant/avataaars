@@ -22,13 +22,13 @@ function makeColor(name: string, color: string) {
   return withOptionValue(ColorComponent, name);
 }
 
-const Tanned = makeColor("Tanned", "#FD9841");
-const Yellow = makeColor("Yellow", "#F8D25C");
-const Pale = makeColor("Pale", "#FFDBB4");
-const Light = makeColor("Light", "#EDB98A");
-const Brown = makeColor("Brown", "#D08B5B");
-const DarkBrown = makeColor("DarkBrown", "#AE5D29");
-const Black = makeColor("Black", "#614335");
+export const Tanned = makeColor("Tanned", "#FD9841");
+export const Yellow = makeColor("Yellow", "#F8D25C");
+export const Pale = makeColor("Pale", "#FFDBB4");
+export const Light = makeColor("Light", "#EDB98A");
+export const Brown = makeColor("Brown", "#D08B5B");
+export const DarkBrown = makeColor("DarkBrown", "#AE5D29");
+export const Black = makeColor("Black", "#614335");
 
 export default function Skin({ maskID }: Props) {
   return (
