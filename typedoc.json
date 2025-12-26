@@ -21,6 +21,7 @@
     "Avatar Components",
     "Options System",
     "Types"
-  ]
+  ],
+  "highlightLanguages": ["jsx", "tsx", "typescript", "javascript", "json", "bash", "shell"]
 }
 

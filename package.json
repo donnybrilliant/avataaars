@@ -1,5 +1,5 @@
 {
-  "name": "avataaars",
+  "name": "@vierweb/avataaars",
   "version": "3.0.0",
   "description": "React 19-compatible component for avataaars with optional animation features",
   "type": "module",
@@ -16,8 +16,10 @@
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "docs": "typedoc",
-    "docs:serve": "typedoc --watch",
+    "start": "npm run build && npm run docs && npm run demo",
     "demo": "npm run build && cd demo && npm run dev",
+    "demo:build": "npm run build && cd demo && npm run build",
+    "demo:preview": "npm run demo:build && cd demo && npm run preview",
     "prepublishOnly": "npm run build && npm run lint"
   },
   "keywords": [
@@ -48,7 +50,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "typescript": "^5.9.3",
-    "typedoc": "^0.27.0",
+    "typedoc": "^0.28.15",
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
     "eslint-plugin-react-hooks": "^7.0.1",
