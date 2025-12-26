@@ -66,3 +66,4 @@ demo/node_modules
 demo/dist
 demo/.vite
 
+.DS_Store

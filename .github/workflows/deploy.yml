@@ -1,75 +1,80 @@
 name: Deploy to GitHub Pages
 
 on:
-    push:
-        branches:
-            - main
-            - master
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
 
 permissions:
-    contents: read
-    pages: write
-    id-token: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-    group: "pages"
-    cancel-in-progress: false
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-    build-and-deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "24"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
 
-            - name: Install root dependencies
-              run: npm ci
+      - name: Install root dependencies
+        run: npm ci
 
-            - name: Build package
-              run: npm run build
+      - name: Build package
+        run: npm run build
 
-            - name: Generate documentation
-              run: npm run docs
+      - name: Generate documentation
+        run: npm run docs
 
-            - name: Install demo dependencies
-              working-directory: ./demo
-              run: npm ci
+      - name: Install demo dependencies
+        working-directory: ./demo
+        run: npm ci
 
-            - name: Build demo
-              working-directory: ./demo
-              env:
-                  BASE_PATH: "/" # Custom domain, so root path
-              run: npm run build
+      - name: Build demo
+        working-directory: ./demo
+        env:
+          BASE_PATH: "/" # Custom domain, so root path
+        run: npm run build
 
-            - name: Setup Pages
-              uses: actions/configure-pages@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-            - name: Prepare deployment
-              run: |
-                  # Create deployment directory
-                  mkdir -p _deploy
+      - name: Prepare deployment
+        run: |
+          # Create deployment directory
+          mkdir -p _deploy
 
-                  # Copy demo build to root
-                  cp -r demo/dist/* _deploy/
+          # Copy demo build to root
+          cp -r demo/dist/* _deploy/
 
-                  # Copy docs to docs subdirectory
-                  mkdir -p _deploy/docs
-                  cp -r docs/* _deploy/docs/
+          # Copy docs to docs subdirectory (including media directory)
+          mkdir -p _deploy/docs
+          cp -r docs/* _deploy/docs/
 
-                  # Create a simple index.html redirect if needed (optional)
-                  # The demo's index.html should already be at the root
+          # Verify media directory was copied
+          if [ ! -d "_deploy/docs/media" ]; then
+              echo "Warning: media directory not found in docs"
+          else
+              echo "✓ Media directory copied successfully"
+              ls -la _deploy/docs/media/ | head -5
+          fi
 
-            - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
-              with:
-                  path: _deploy
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _deploy
 
-            - name: Deploy to GitHub Pages
-              id: deployment
-              uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
