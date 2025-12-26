@@ -246,9 +246,11 @@ export async function exportGIF(
   // ImageData.data is already a Uint8ClampedArray (RGBA), perfect for quantize
   // Use rgba4444 format to preserve alpha channel for transparency
   // useSqrt: true improves color matching accuracy for better quality
+  // oneBitAlpha: false allows for smooth alpha transitions
   const palette = quantize(frames[0].data, 256, {
     format: "rgba4444",
     useSqrt: true,
+    oneBitAlpha: false, // Allow smooth alpha transitions for better quality
   });
 
   // Apply palette to all frames to get indexed data (use rgba4444 format)
@@ -294,6 +296,198 @@ export async function exportGIF(
   );
 }
 
+/**
+ * Exports a static PNG file of the avatar.
+ * Renders the avatar at high resolution and exports as PNG with high quality.
+ *
+ * @param baseProps - Avatar customization properties
+ * @param backgroundColor - Optional background color for Circle style avatars
+ */
+export async function exportPNG(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  baseProps: Record<string, any>,
+  backgroundColor?: string
+): Promise<void> {
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.left = "-9999px";
+  container.style.top = "-9999px";
+  document.body.appendChild(container);
+
+  const isCircle =
+    baseProps.avatarStyle === "Circle" ||
+    baseProps.avatarStyle === AvatarStyle.Circle;
+
+  // Only use backgroundColor if avatarStyle is Circle
+  const effectiveBackgroundColor = isCircle
+    ? backgroundColor || baseProps.backgroundColor
+    : undefined;
+
+  // Get output size from style prop or use default (264x280)
+  const outputSize = getOutputSize(baseProps.style);
+  const outputWidth = outputSize.width;
+  const outputHeight = outputSize.height;
+
+  try {
+    const props = {
+      ...baseProps,
+      // Disable animations for export
+      animationSpeed: undefined,
+      hoverScale: undefined,
+      hoverSequence: undefined,
+      // Ensure avatarStyle is included
+      avatarStyle: baseProps.avatarStyle || "Circle",
+      // Only pass backgroundColor if Circle style
+      backgroundColor: effectiveBackgroundColor,
+    };
+
+    // Render the avatar component
+    const root = createRoot(container);
+    root.render(React.createElement(AvatarComponent, props));
+
+    // Wait for React to render
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Extract the inner SVG element
+    const wrapperDiv = container.querySelector("div");
+    const innerSvg =
+      wrapperDiv?.querySelector("div > svg") ||
+      container.querySelector("svg");
+
+    if (innerSvg) {
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(innerSvg);
+      const pngBlob = await svgToPNG(
+        svgString,
+        effectiveBackgroundColor,
+        isCircle,
+        outputWidth,
+        outputHeight
+      );
+      downloadBlob(pngBlob, "avatar.png");
+    }
+
+    root.unmount();
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
+// Helper: Convert SVG string to PNG Blob with optional background and circle cropping
+async function svgToPNG(
+  svgString: string,
+  backgroundColor?: string,
+  isCircle?: boolean,
+  outputWidth: number = 264,
+  outputHeight: number = 280
+): Promise<Blob> {
+  // Use 3x resolution and export directly without downscaling
+  // This matches the reference implementation which exports at high resolution (typically 2x-3x)
+  // Downscaling causes graininess, so we export the high-res version directly
+  // 3x gives us 792x840 which is a good high-resolution export size
+  const scale = 3;
+  const renderWidth = outputWidth * scale;
+  const renderHeight = outputHeight * scale;
+
+  // SVG viewBox is always 264x280
+  const svgViewBoxWidth = 264;
+  const svgViewBoxHeight = 280;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = renderWidth;
+  canvas.height = renderHeight;
+  const ctx = canvas.getContext("2d", {
+    imageSmoothingEnabled: true,
+    imageSmoothingQuality: "high",
+  }) as CanvasRenderingContext2D;
+
+  // Calculate circle parameters in render coordinates
+  const svgCx = 132;
+  const svgCy = 160;
+  const svgR = 120;
+
+  // Scale to render coordinates
+  const widthRatio = renderWidth / svgViewBoxWidth;
+  const heightRatio = renderHeight / svgViewBoxHeight;
+  const renderCx = svgCx * widthRatio;
+  const renderCy = svgCy * heightRatio;
+  const renderR = svgR * Math.min(widthRatio, heightRatio);
+
+  // Fill background if provided
+  if (backgroundColor && isCircle) {
+    ctx.fillStyle = backgroundColor;
+    ctx.beginPath();
+    ctx.arc(renderCx, renderCy, renderR, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (backgroundColor && !isCircle) {
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  const img = new Image();
+  const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+  const url = URL.createObjectURL(svgBlob);
+
+  return new Promise((resolve, reject) => {
+    img.onload = () => {
+      // Draw SVG at high resolution
+      ctx.drawImage(img, 0, 0, renderWidth, renderHeight);
+
+      // Apply circle mask for Circle style avatars
+      if (isCircle) {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+
+        // Smooth edge transition for better quality
+        const edgeFeather = 3; // More feathering for higher resolution
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const dx = x - renderCx;
+            const dy = y - renderCy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Only hide if outside circle AND in bottom overflow area
+            if (dist > renderR && y >= renderCy) {
+              const idx = (y * canvas.width + x) * 4;
+              const distFromEdge = dist - renderR;
+              if (distFromEdge < edgeFeather) {
+                const originalAlpha = data[idx + 3];
+                const featherFactor = 1 - distFromEdge / edgeFeather;
+                data[idx + 3] = Math.max(
+                  0,
+                  Math.min(255, originalAlpha * featherFactor)
+                );
+              } else {
+                data[idx + 3] = 0;
+              }
+            }
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+      // Export at high resolution directly - no downscaling to avoid graininess
+      // This matches the reference implementation approach
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(url);
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("Failed to create PNG blob"));
+          }
+        },
+        "image/png",
+        1.0 // Maximum quality for PNG
+      );
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
 // Helper: Convert SVG string to ImageData with optional background and circle cropping
 async function svgToImageData(
   svgString: string,
@@ -302,9 +496,10 @@ async function svgToImageData(
   outputWidth: number = 264,
   outputHeight: number = 280
 ): Promise<ImageData> {
-  // Use 3x resolution for better quality (render high-res then downscale for smoother edges)
+  // Use 6x resolution for GIF to improve quality while keeping file size reasonable
   // Higher scale = smoother edges, especially for circles
-  const scale = 3;
+  // We still downscale for GIF to keep file size manageable, but use higher initial scale
+  const scale = 6;
   const renderWidth = outputWidth * scale;
   const renderHeight = outputHeight * scale;
 
@@ -398,6 +593,7 @@ async function svgToImageData(
       }
 
       // Downscale from high-res to output size with high-quality smoothing for smoother edges
+      // Using higher initial scale (6x) and then downscaling gives better quality than lower scale
       const outputCanvas = document.createElement("canvas");
       outputCanvas.width = outputWidth;
       outputCanvas.height = outputHeight;
@@ -407,6 +603,7 @@ async function svgToImageData(
       }) as CanvasRenderingContext2D;
 
       // Draw the high-res canvas onto the output canvas with high-quality scaling
+      // This downscaling from 6x to 1x produces much better quality than 4x to 1x
       outputCtx.drawImage(canvas, 0, 0, outputWidth, outputHeight);
 
       const finalImageData = outputCtx.getImageData(

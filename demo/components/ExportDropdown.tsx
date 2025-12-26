@@ -3,13 +3,14 @@ import type {
   AvatarCustomizationProps,
   HoverExpression,
 } from "../types/avatarTypes";
-import { exportAnimatedSVG, exportGIF } from "../utils/exportUtils";
+import { exportAnimatedSVG, exportGIF, exportPNG } from "../utils/exportUtils";
 
 interface ExportDropdownProps {
   avatarProps: AvatarCustomizationProps;
   expressions: HoverExpression[];
   frameDelay?: number;
   backgroundColor?: string;
+  idleAnimationEnabled: boolean;
 }
 
 export default function ExportDropdown({
@@ -17,6 +18,7 @@ export default function ExportDropdown({
   expressions,
   frameDelay = 500,
   backgroundColor,
+  idleAnimationEnabled,
 }: ExportDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -120,6 +122,22 @@ export default function ExportDropdown({
     }
   };
 
+  /**
+   * Handles export of static PNG. Only available when idle animation is disabled.
+   */
+  const handleExportPNG = async () => {
+    setIsExporting(true);
+    setIsOpen(false);
+
+    try {
+      await exportPNG(getBaseProps(), backgroundColor);
+    } catch {
+      alert("Error exporting PNG. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div ref={dropdownRef} style={{ position: "relative" }}>
       <button
@@ -172,6 +190,35 @@ export default function ExportDropdown({
             overflow: "hidden",
           }}
         >
+          {!idleAnimationEnabled && (
+            <button
+              onClick={handleExportPNG}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                backgroundColor: "transparent",
+                color: "#333",
+                border: "none",
+                textAlign: "left",
+                cursor: "pointer",
+                fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                transition: "background-color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f5f5f5";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
+              title="Export static avatar as PNG (only available when idle animation is disabled)"
+            >
+              <span>🖼️</span>
+              <span>Export to PNG</span>
+            </button>
+          )}
           <button
             onClick={handleExportGIF}
             disabled={!expressions.length}
@@ -181,6 +228,7 @@ export default function ExportDropdown({
               backgroundColor: "transparent",
               color: expressions.length ? "#333" : "#999",
               border: "none",
+              borderTop: !idleAnimationEnabled ? "1px solid #eee" : "none",
               textAlign: "left",
               cursor: expressions.length ? "pointer" : "not-allowed",
               fontSize: "14px",

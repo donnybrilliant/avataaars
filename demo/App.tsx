@@ -175,6 +175,7 @@ function App() {
           expressions={settings.hoverSequence}
           frameDelay={settings.hoverAnimationSpeed}
           backgroundColor={settings.backgroundColor}
+          idleAnimationEnabled={settings.idleAnimationEnabled}
         />
       </div>
       <p style={{ color: "#666", marginBottom: "30px" }}>
