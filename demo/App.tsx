@@ -45,6 +45,7 @@ const defaultSettings: AvatarSettings = {
     { mouth: "Vomit", eyes: "Close", eyebrow: "SadConcerned" },
     { mouth: "Grimace", eyes: "EyeRoll", eyebrow: "UnibrowNatural" },
   ],
+  width: 300,
 };
 
 /**
@@ -176,6 +177,7 @@ function App() {
           frameDelay={settings.hoverAnimationSpeed}
           backgroundColor={settings.backgroundColor}
           idleAnimationEnabled={settings.idleAnimationEnabled}
+          width={settings.width}
         />
       </div>
       <p style={{ color: "#666", marginBottom: "30px" }}>
@@ -200,6 +202,130 @@ function App() {
       />
 
       <CodeGenerator props={props} settings={settings} />
+
+      {/* Footer with links */}
+      <footer
+        style={{
+          marginTop: "60px",
+          paddingTop: "30px",
+          borderTop: "1px solid #e0e0e0",
+          textAlign: "center",
+          color: "#666",
+          fontSize: "14px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "clamp(15px, 3vw, 30px)",
+            marginBottom: "15px",
+          }}
+        >
+          <a
+            href="https://github.com/donnybrilliant/avataaars"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#4CAF50",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = "underline";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = "none";
+            }}
+          >
+            <span>📖</span>
+            <span>Main README</span>
+          </a>
+          <a
+            href="https://github.com/donnybrilliant/avataaars/tree/main/demo"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#4CAF50",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = "underline";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = "none";
+            }}
+          >
+            <span>🎨</span>
+            <span>Demo README</span>
+          </a>
+          <a
+            href="https://avataaars.vierweb.no/docs/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#4CAF50",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = "underline";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = "none";
+            }}
+          >
+            <span>📚</span>
+            <span>API Documentation</span>
+          </a>
+          <a
+            href="https://www.npmjs.com/package/@vierweb/avataaars"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#4CAF50",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = "underline";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = "none";
+            }}
+          >
+            <span>📦</span>
+            <span>NPM Package</span>
+          </a>
+        </div>
+        <p style={{ margin: 0, fontSize: "12px", color: "#999" }}>
+          Made with ❤️ by{" "}
+          <a
+            href="https://vierweb.no"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#4CAF50", textDecoration: "none" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = "underline";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = "none";
+            }}
+          >
+            Vierweb
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }

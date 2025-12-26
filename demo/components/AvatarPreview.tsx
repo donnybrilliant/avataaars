@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Avatar from "@vierweb/avataaars";
 import type {
   AvatarCustomizationProps,
@@ -15,6 +16,25 @@ interface AvatarPreviewProps {
  * It handles the complex logic of combining customization props with animation settings.
  */
 export default function AvatarPreview({ props, settings }: AvatarPreviewProps) {
+  const [maxPreviewWidth, setMaxPreviewWidth] = useState(600);
+
+  // Calculate responsive max width for preview
+  useEffect(() => {
+    const calculateMaxWidth = () => {
+      const viewportWidth = window.innerWidth;
+      const padding = 160; // Total padding from container and preview
+      const calculatedMax = Math.min(
+        600,
+        Math.max(100, viewportWidth - padding)
+      );
+      setMaxPreviewWidth(calculatedMax);
+    };
+
+    calculateMaxWidth();
+    window.addEventListener("resize", calculateMaxWidth);
+    return () => window.removeEventListener("resize", calculateMaxWidth);
+  }, []);
+
   const avatarProps: AvatarProps = {
     ...props,
   };
@@ -84,11 +104,26 @@ export default function AvatarPreview({ props, settings }: AvatarPreviewProps) {
     delete avatarProps.mouthType;
   }
 
+  // Calculate height based on width to maintain aspect ratio (264:280)
+  // Avatar's natural aspect ratio is 264/280 = 0.942857...
+  const aspectRatio = 280 / 264; // height/width ratio
+
+  // For preview, clamp width to viewport to prevent overflow
+  // But allow the full width value to be stored for exports
+  const previewWidth = Math.min(settings.width, maxPreviewWidth);
+  const height = previewWidth * aspectRatio;
+
+  // Apply style prop with clamped width for preview
+  avatarProps.style = {
+    width: `${previewWidth}px`,
+    height: `${height}px`,
+  };
+
   return (
     <div
       style={{
         background: "white",
-        padding: "40px",
+        padding: "clamp(20px, 4vw, 40px)",
         borderRadius: "12px",
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         textAlign: "center",
@@ -96,6 +131,11 @@ export default function AvatarPreview({ props, settings }: AvatarPreviewProps) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        width: "100%",
+        boxSizing: "border-box",
+        overflow: "visible",
+        position: "relative",
+        zIndex: 1,
       }}
     >
       <h2 style={{ marginBottom: "20px", color: "#333" }}>Preview</h2>
@@ -104,7 +144,13 @@ export default function AvatarPreview({ props, settings }: AvatarPreviewProps) {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          minHeight: "280px",
+          // Container shrinks/grows to fit the avatar naturally
+          width: "fit-content",
+          height: "fit-content",
+          minHeight: "100px", // Ensure minimum height for layout stability
+          maxWidth: "100%", // Prevent overflow on mobile
+          position: "relative",
+          zIndex: 10,
         }}
       >
         <Avatar {...avatarProps} />

@@ -15,7 +15,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@vierweb/avataaars": ["../dist/index"],
+      "@vierweb/avataaars/options": ["../dist/options/index"]
+    }
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "dist", "vite.config.ts"],

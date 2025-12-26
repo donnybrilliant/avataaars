@@ -11,6 +11,7 @@ interface ExportDropdownProps {
   frameDelay?: number;
   backgroundColor?: string;
   idleAnimationEnabled: boolean;
+  width: number;
 }
 
 export default function ExportDropdown({
@@ -19,6 +20,7 @@ export default function ExportDropdown({
   frameDelay = 500,
   backgroundColor,
   idleAnimationEnabled,
+  width,
 }: ExportDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -29,6 +31,10 @@ export default function ExportDropdown({
    * Used for export operations where expressions are provided separately.
    */
   const getBaseProps = () => {
+    // Calculate height based on width to maintain aspect ratio (264:280)
+    const aspectRatio = 280 / 264; // height/width ratio
+    const height = width * aspectRatio;
+
     const props: Record<string, unknown> = {
       avatarStyle: avatarProps.avatarStyle,
       topType: avatarProps.topType,
@@ -41,6 +47,10 @@ export default function ExportDropdown({
       clotheColor: avatarProps.clotheColor,
       graphicType: avatarProps.graphicType,
       skinColor: avatarProps.skinColor,
+      style: {
+        width: `${width}px`,
+        height: `${height}px`,
+      },
     };
     if (backgroundColor) {
       props.backgroundColor = backgroundColor;

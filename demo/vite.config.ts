@@ -3,6 +3,18 @@ import react from "@vitejs/plugin-react";
 import { readFileSync, existsSync, statSync } from "fs";
 import { resolve, join } from "path";
 
+// Use local dist in development for testing
+const useLocalDist =
+  process.env.USE_LOCAL_DIST !== "false" &&
+  process.env.NODE_ENV !== "production" &&
+  existsSync(resolve(__dirname, "..", "dist", "index.js"));
+
+if (useLocalDist) {
+  console.log("📦 Using local dist folder for @vierweb/avataaars");
+} else {
+  console.log("📦 Using npm package @vierweb/avataaars");
+}
+
 export default defineConfig({
   base: process.env.BASE_PATH || "/",
   plugins: [
@@ -11,6 +23,24 @@ export default defineConfig({
         plugins: ["babel-plugin-react-compiler"],
       },
     }),
+    // Plugin to resolve local dist folder for @vierweb/avataaars
+    ...(useLocalDist
+      ? [
+          {
+            name: "resolve-local-avataaars",
+            enforce: "pre" as const,
+            resolveId(id: string) {
+              if (id === "@vierweb/avataaars") {
+                return resolve(__dirname, "..", "dist", "index.js");
+              }
+              if (id === "@vierweb/avataaars/options") {
+                return resolve(__dirname, "..", "dist", "options", "index.js");
+              }
+              return null;
+            },
+          },
+        ]
+      : []),
     // Plugin to serve docs from /docs path
     {
       name: "serve-docs",
