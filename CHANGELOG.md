@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Future features and improvements will be documented here.
 
+## [3.0.2] - 2024-12-26
+
+### Fixed
+
+- Fixed missing dropdown options for Hair Color, Facial Hair Color, Skin Color, and Clothe Color in demo applications
+- Exported individual color components from color modules to enable proper option value extraction
+- Updated `extractOptionValuesFromModule` function to properly filter module exports
+
 ## [3.0.1] - 2025-12-26
 
 ### Added
