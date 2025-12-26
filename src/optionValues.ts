@@ -156,6 +156,10 @@ function extractOptionValuesFromModule(
 ): string[] {
   const values: string[] = [];
   for (const key in module) {
+    // Skip default export and other non-component properties
+    if (key === "default" || key === "__esModule") {
+      continue;
+    }
     const component = module[key];
     if (hasOptionValue(component)) {
       values.push(component.optionValue);

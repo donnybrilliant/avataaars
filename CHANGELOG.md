@@ -7,9 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed missing dropdown options for Hair Color, Facial Hair Color, Skin Color, and Clothe Color in demo applications
+- Added missing `./options` export path to package.json exports field to support `@vierweb/avataaars/options` imports
+- Exported individual color components from color modules to enable proper option value extraction
+
 ### Added
 
 - Future features and improvements will be documented here.
+
+## [3.0.2] - 2024-12-26
+
+### Fixed
+
+- Fixed missing dropdown options for Hair Color, Facial Hair Color, Skin Color, and Clothe Color in demo applications
+- Exported individual color components from color modules to enable proper option value extraction
+- Updated `extractOptionValuesFromModule` function to properly filter module exports
+
+## [3.0.1] - 2025-12-26
+
+### Added
+
+- **Options Module Export**: Added `./options` export path to package.json
+  - Users can now import options from `@vierweb/avataaars/options`
+  - Enables importing individual option objects (TopOption, EyesOption, etc.) and option constants
+  - Example: `import { TopOption, EyesOption } from '@vierweb/avataaars/options'`
+
+### Changed
+
+- **Demo Updates**: Demo now uses the published npm package instead of local dist folder
+  - Demo package.json updated to use `@vierweb/avataaars` as a dependency
+  - All imports updated from local paths to npm package imports
+  - Added installation instructions code block in CodeGenerator component
 
 ## [3.0.0] - 2024-12-26
 

@@ -1,6 +1,6 @@
 {
   "name": "@vierweb/avataaars",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "React 19-compatible component for avataaars with optional animation features",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./options": {
+      "types": "./dist/options/index.d.ts",
+      "import": "./dist/options/index.js"
     }
   },
   "scripts": {

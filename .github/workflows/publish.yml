@@ -33,4 +33,3 @@ jobs:
 
       - name: Publish to NPM
         run: npm publish --provenance --access public
-        # No NODE_AUTH_TOKEN needed - OIDC handles authentication automatically
