@@ -28,6 +28,16 @@ interface CodeGeneratorProps {
  */
 type CodeLanguage = "js" | "ts";
 
+/**
+ * Default hover sequence values matching the Avatar component's getDefaultHoverSequence
+ */
+const DEFAULT_HOVER_SEQUENCE = [
+  { mouthType: "Disbelief", eyeType: "Surprised", eyebrowType: "UpDown" },
+  { mouthType: "ScreamOpen", eyeType: "Dizzy", eyebrowType: "Angry" },
+  { mouthType: "Vomit", eyeType: "Close", eyebrowType: "SadConcerned" },
+  { mouthType: "Grimace", eyeType: "EyeRoll", eyebrowType: "UnibrowNatural" },
+] as const;
+
 export default function CodeGenerator({ props, settings }: CodeGeneratorProps) {
   const [copied, setCopied] = useState(false);
   const [installCopied, setInstallCopied] = useState(false);
@@ -41,14 +51,39 @@ export default function CodeGenerator({ props, settings }: CodeGeneratorProps) {
   const generateCode = (lang: CodeLanguage = language) => {
     const lines: string[] = [];
 
+    // Check if we need HoverExpression type
+    const needsHoverExpression = settings.hoverAnimationEnabled && settings.hoverSequence.length > 0;
+
     if (lang === "ts") {
-      lines.push("import Avatar from '@vierweb/avataaars';");
+      // Determine which types to import based on what's being used
+      if (needsHoverExpression) {
+        lines.push("import Avatar, { type Props, type HoverExpression } from '@vierweb/avataaars';");
+      } else {
+        lines.push("import Avatar, { type Props } from '@vierweb/avataaars';");
+      }
       lines.push("");
       lines.push("function MyAvatar(): JSX.Element {");
     } else {
       lines.push("import Avatar from '@vierweb/avataaars';");
       lines.push("");
       lines.push("function MyAvatar() {");
+    }
+
+    // For TypeScript with hoverSequence, define the typed variable before return
+    if (lang === "ts" && needsHoverExpression) {
+      lines.push("  const hoverSequence: HoverExpression[] = [");
+      settings.hoverSequence.forEach((expr, index) => {
+        const comma = index < settings.hoverSequence.length - 1 ? "," : "";
+        const defaultExpr = DEFAULT_HOVER_SEQUENCE[index] || DEFAULT_HOVER_SEQUENCE[0];
+        const mouthType = expr.mouthType || defaultExpr.mouthType;
+        const eyeType = expr.eyeType || defaultExpr.eyeType;
+        const eyebrowType = expr.eyebrowType || defaultExpr.eyebrowType;
+        lines.push(
+          `    { mouthType: "${mouthType}", eyeType: "${eyeType}", eyebrowType: "${eyebrowType}" }${comma}`
+        );
+      });
+      lines.push("  ];");
+      lines.push("");
     }
 
     lines.push("  return (");
@@ -109,14 +144,24 @@ export default function CodeGenerator({ props, settings }: CodeGeneratorProps) {
     }
 
     if (settings.hoverAnimationEnabled && settings.hoverSequence.length > 0) {
-      lines.push("      hoverSequence={[");
-      settings.hoverSequence.forEach((expr, index) => {
-        const comma = index < settings.hoverSequence.length - 1 ? "," : "";
-        lines.push(
-          `        { mouth: "${expr.mouth}", eyes: "${expr.eyes}", eyebrow: "${expr.eyebrow}" }${comma}`
-        );
-      });
-      lines.push("      ]}");
+      if (lang === "ts") {
+        // Use the typed variable defined earlier
+        lines.push("      hoverSequence={hoverSequence}");
+      } else {
+        // JavaScript: inline array
+        lines.push("      hoverSequence={[");
+        settings.hoverSequence.forEach((expr, index) => {
+          const comma = index < settings.hoverSequence.length - 1 ? "," : "";
+          const defaultExpr = DEFAULT_HOVER_SEQUENCE[index] || DEFAULT_HOVER_SEQUENCE[0];
+          const mouthType = expr.mouthType || defaultExpr.mouthType;
+          const eyeType = expr.eyeType || defaultExpr.eyeType;
+          const eyebrowType = expr.eyebrowType || defaultExpr.eyebrowType;
+          lines.push(
+            `        { mouthType: "${mouthType}", eyeType: "${eyeType}", eyebrowType: "${eyebrowType}" }${comma}`
+          );
+        });
+        lines.push("      ]}");
+      }
       lines.push(`      hoverAnimationSpeed={${settings.hoverAnimationSpeed}}`);
     }
 

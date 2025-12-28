@@ -1,4 +1,5 @@
 import { useId } from "react";
+import type { CSSProperties } from "react";
 
 import Accessories from "./top/accessories";
 import Clothe from "./clothes";
@@ -13,7 +14,6 @@ export type { AvatarSvgProps as Props };
 
 export default function Avatar({
   avatarStyle,
-  className,
   style,
 }: AvatarSvgProps) {
   const path1 = useId();
@@ -25,16 +25,59 @@ export default function Avatar({
 
   const circle = avatarStyle === AvatarStyle.Circle;
 
+  // Extract width and height from style prop if provided, otherwise use defaults
+  const svgWidth = style?.width ? (typeof style.width === "number" ? `${style.width}px` : style.width) : "264px";
+  const svgHeight = style?.height ? (typeof style.height === "number" ? `${style.height}px` : style.height) : "280px";
+
+  // Create isolated style object that prevents external CSS from affecting the SVG
+  const isolatedStyle: CSSProperties = {
+    // CSS isolation: reset all inherited styles
+    all: "initial",
+    // Restore essential SVG properties
+    display: "block",
+    // Apply width/height from style prop or defaults
+    width: svgWidth,
+    height: svgHeight,
+    // Merge other style properties (excluding width/height to avoid duplication)
+    ...(style ? Object.entries(style)
+      .filter(([key]) => key !== "width" && key !== "height")
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {} as Record<string, CSSProperties[keyof CSSProperties]>)
+    : {}),
+    // Ensure these critical properties are always set to prevent external CSS interference
+    boxSizing: "border-box",
+    margin: "0",
+    padding: "0",
+    border: "none",
+    verticalAlign: "baseline",
+    font: "initial",
+    color: "initial",
+    background: "transparent",
+    // Explicitly block visual effects that external CSS might try to add
+    boxShadow: "none",
+    filter: "none",
+    backdropFilter: "none",
+    textShadow: "none",
+    // Prevent external transforms (we handle transforms internally for animations)
+    transform: "none",
+    // Prevent external opacity changes
+    opacity: "1",
+  };
+
   return (
     <svg
-      style={style}
-      className={className}
-      width="264px"
-      height="280px"
+      style={isolatedStyle}
+      width={svgWidth}
+      height={svgHeight}
       viewBox="0 0 264 280"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
+      // Prevent external CSS from targeting child elements via CSS reset
+      // Note: Inline attributes (fill, stroke, etc.) take precedence over CSS,
+      // but we add this style to the root SVG to minimize inheritance
     >
       <desc>Created with getavataaars.com</desc>
       <defs>

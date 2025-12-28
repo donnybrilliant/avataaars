@@ -364,6 +364,49 @@ function BearImpl({ maskID }: Props) {
 
 export const Bear = withOptionValue(BearImpl, 'Bear');
 
+function PalestineImpl({ maskID }: Props) {
+  return (
+    <g
+      id='Clothing/Graphic/Palestine'
+      mask={`url(#${maskID})`}
+      fillRule='evenodd'>
+      <g transform='translate(77.000000, 58.000000)' id='Palestine'>
+        {/* Red triangle on the left - traditional Palestinian flag proportions */}
+        <path
+          d='M0,0 L65,50 L0,100 Z'
+          fill='#CE1126'
+        />
+        {/* Black stripe (top third) */}
+        <rect
+          x='65'
+          y='0'
+          width='135'
+          height='33.33'
+          fill='#000000'
+        />
+        {/* White stripe (middle third) */}
+        <rect
+          x='65'
+          y='33.33'
+          width='135'
+          height='33.34'
+          fill='#FFFFFF'
+        />
+        {/* Green stripe (bottom third) */}
+        <rect
+          x='65'
+          y='66.67'
+          width='135'
+          height='33.33'
+          fill='#007A3D'
+        />
+      </g>
+    </g>
+  );
+}
+
+export const Palestine = withOptionValue(PalestineImpl, 'Palestine');
+
 export default function Graphics({ maskID }: Props) {
   return (
     <Selector option={GraphicOption} defaultOption={Skull}>
@@ -376,6 +419,7 @@ export default function Graphics({ maskID }: Props) {
       <Resist maskID={maskID} />
       <Selena maskID={maskID} />
       <Bear maskID={maskID} />
+      <Palestine maskID={maskID} />
       <SkullOutline maskID={maskID} />
       <Skull maskID={maskID} />
     </Selector>

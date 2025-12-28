@@ -21,7 +21,7 @@ import {
   useId,
 } from "react";
 
-import Avatar, { AvatarStyle } from "./avatar";
+import AvatarComponent, { AvatarStyle } from "./avatar";
 import { OptionContext, allOptions, OptionContextReact } from "./options";
 import type { AvatarProps, HoverExpression, OptionKey } from "./types";
 
@@ -141,7 +141,7 @@ interface ExpressionToRestore {
  *
  * @example
  * ```tsx
- * <AvatarComponent
+ * <Avatar
  *   avatarStyle={AvatarStyle.Circle}
  *   topType="LongHairStraight"
  *   eyeType="Happy"
@@ -150,7 +150,7 @@ interface ExpressionToRestore {
  * />
  * ```
  */
-export default function AvatarComponent(props: AvatarProps) {
+export default function Avatar(props: AvatarProps) {
   // Create option context instance (memoized to persist across renders)
   const optionContext = useMemo(() => new OptionContext(allOptions), []);
 
@@ -248,11 +248,7 @@ export default function AvatarComponent(props: AvatarProps) {
   > | null>(null);
 
   // State preservation for animation transitions
-  const savedStateRef = useRef<{
-    mouth: string;
-    eyes: string;
-    eyebrow: string;
-  } | null>(null);
+  const savedStateRef = useRef<HoverExpression | null>(null);
 
   // Original prop values for restoration after hover animations
   const originalPropsRef = useRef<{
@@ -291,7 +287,6 @@ export default function AvatarComponent(props: AvatarProps) {
   const {
     avatarStyle,
     style,
-    className,
     animationSpeed: rawAnimationSpeed,
     hoverScale: rawHoverScale,
     backgroundColor = "#65C9FF",
@@ -588,10 +583,14 @@ export default function AvatarComponent(props: AvatarProps) {
    */
   const getDefaultHoverSequence = useCallback(
     (): HoverExpression[] => [
-      { mouth: "Disbelief", eyes: "Surprised", eyebrow: "UpDown" },
-      { mouth: "ScreamOpen", eyes: "Dizzy", eyebrow: "Angry" },
-      { mouth: "Vomit", eyes: "Close", eyebrow: "SadConcerned" },
-      { mouth: "Grimace", eyes: "EyeRoll", eyebrow: "UnibrowNatural" },
+      { mouthType: "Disbelief", eyeType: "Surprised", eyebrowType: "UpDown" },
+      { mouthType: "ScreamOpen", eyeType: "Dizzy", eyebrowType: "Angry" },
+      { mouthType: "Vomit", eyeType: "Close", eyebrowType: "SadConcerned" },
+      {
+        mouthType: "Grimace",
+        eyeType: "EyeRoll",
+        eyebrowType: "UnibrowNatural",
+      },
     ],
     []
   );
@@ -606,9 +605,9 @@ export default function AvatarComponent(props: AvatarProps) {
     let i = 0;
     hoverIntervalRef.current = window.setInterval(() => {
       const s = seq[i % seq.length];
-      setMouth(s.mouth);
-      setEyes(s.eyes);
-      setEyebrow(s.eyebrow);
+      setMouth(s.mouthType);
+      setEyes(s.eyeType);
+      setEyebrow(s.eyebrowType);
       i++;
     }, hoverAnimationSpeed);
   }, [
@@ -671,9 +670,9 @@ export default function AvatarComponent(props: AvatarProps) {
       if (isIdleAnimating) {
         // Idle animation is running: pause it and save current state
         savedStateRef.current = {
-          mouth: mouth || "Default",
-          eyes: eyes || "Default",
-          eyebrow: eyebrow || "Default",
+          mouthType: mouth || "Default",
+          eyeType: eyes || "Default",
+          eyebrowType: eyebrow || "Default",
         };
         if (animationIntervalRef.current !== null) {
           clearTimeout(animationIntervalRef.current);
@@ -682,9 +681,9 @@ export default function AvatarComponent(props: AvatarProps) {
       } else {
         // No idle animation: save current state (from props or defaults)
         savedStateRef.current = {
-          mouth: propMouthType || mouth || "Default",
-          eyes: propEyeType || eyes || "Default",
-          eyebrow: propEyebrowType || eyebrow || "Default",
+          mouthType: propMouthType || mouth || "Default",
+          eyeType: propEyeType || eyes || "Default",
+          eyebrowType: propEyebrowType || eyebrow || "Default",
         };
         // Set initial state to current values so hover sequence can override them
         if (canAnimateExpressions) {
@@ -697,9 +696,9 @@ export default function AvatarComponent(props: AvatarProps) {
     } else if (isIdleAnimating) {
       // Only hover scale, no hover animation: pause idle animation
       savedStateRef.current = {
-        mouth: mouth || "Default",
-        eyes: eyes || "Default",
-        eyebrow: eyebrow || "Default",
+        mouthType: mouth || "Default",
+        eyeType: eyes || "Default",
+        eyebrowType: eyebrow || "Default",
       };
       if (animationIntervalRef.current !== null) {
         clearTimeout(animationIntervalRef.current);
@@ -764,9 +763,9 @@ export default function AvatarComponent(props: AvatarProps) {
         restoreTimeoutRef.current = window.setTimeout(() => {
           // Use saved state (which contains the idle animation state before hover)
           if (savedStateRef.current) {
-            const targetMouth = savedStateRef.current.mouth;
-            const targetEyes = savedStateRef.current.eyes;
-            const targetEyebrow = savedStateRef.current.eyebrow;
+            const targetMouth = savedStateRef.current.mouthType;
+            const targetEyes = savedStateRef.current.eyeType;
+            const targetEyebrow = savedStateRef.current.eyebrowType;
 
             // Restore expressions one by one with delays (in order: mouth, eyes, eyebrow)
             const expressionsToRestore: readonly ExpressionToRestore[] = [
@@ -855,9 +854,9 @@ export default function AvatarComponent(props: AvatarProps) {
         restoreTimeoutRef.current = window.setTimeout(() => {
           // Use saved state (which contains the original values before hover)
           if (savedStateRef.current) {
-            const targetMouth = savedStateRef.current.mouth;
-            const targetEyes = savedStateRef.current.eyes;
-            const targetEyebrow = savedStateRef.current.eyebrow;
+            const targetMouth = savedStateRef.current.mouthType;
+            const targetEyes = savedStateRef.current.eyeType;
+            const targetEyebrow = savedStateRef.current.eyebrowType;
 
             // Restore expressions one by one with delays (in order: mouth, eyes, eyebrow)
             const expressionsToRestore: readonly ExpressionToRestore[] = [
@@ -941,9 +940,9 @@ export default function AvatarComponent(props: AvatarProps) {
        * Only hover scale was active, idle animation was paused.
        * Restore saved state and resume idle animation.
        */
-      setMouth(savedStateRef.current.mouth);
-      setEyes(savedStateRef.current.eyes);
-      setEyebrow(savedStateRef.current.eyebrow);
+      setMouth(savedStateRef.current.mouthType);
+      setEyes(savedStateRef.current.eyeType);
+      setEyebrow(savedStateRef.current.eyebrowType);
       savedStateRef.current = null;
       // Ensure stateRef is updated (isHovered should already be false here)
       stateRef.current.isHovered = false;
@@ -1030,13 +1029,15 @@ export default function AvatarComponent(props: AvatarProps) {
    * Prepare avatar props.
    * When animation container is needed with circle style, use Transparent
    * so the circle background can be rendered separately in the container.
+   *
+   * All styling is handled internally via inline styles.
+   * className prop is not supported to prevent external CSS from affecting the component.
    */
   const avatarProps = {
     avatarStyle: (needsAnimationContainer && isCircle
       ? AvatarStyle.Transparent
       : avatarStyle) as AvatarStyle,
     style,
-    className,
     eyeType: finalEyeType,
     eyebrowType: finalEyebrowType,
     mouthType: finalMouthType,
@@ -1104,7 +1105,7 @@ export default function AvatarComponent(props: AvatarProps) {
    */
   const avatarElement = (
     <OptionContextReact.Provider value={optionContext}>
-      <Avatar {...avatarProps} />
+      <AvatarComponent {...avatarProps} />
     </OptionContextReact.Provider>
   );
 
@@ -1115,6 +1116,7 @@ export default function AvatarComponent(props: AvatarProps) {
    * - Hover scale transformations
    * - Overflow masking for circle style
    * - Hover event handlers (if needed)
+   * - CSS isolation to prevent external styles from affecting the component
    */
   if (needsAnimationContainer) {
     // Scale circle and mask coordinates based on container size
@@ -1128,12 +1130,31 @@ export default function AvatarComponent(props: AvatarProps) {
       <div
         ref={containerRef}
         style={{
+          // CSS isolation: reset all inherited styles
+          all: "initial",
+          // Restore essential display properties
           position: "relative",
           display: "inline-block",
           cursor: "default",
           width: containerWidth,
           height: containerHeight,
           overflow: "visible",
+          // Prevent external CSS from affecting this component
+          boxSizing: "border-box",
+          margin: "0",
+          padding: "0",
+          border: "none",
+          verticalAlign: "baseline",
+          font: "initial",
+          color: "initial",
+          background: "transparent",
+          // Explicitly block visual effects that external CSS might try to add
+          boxShadow: "none",
+          filter: "none",
+          backdropFilter: "none",
+          textShadow: "none",
+          // Prevent external opacity changes
+          opacity: "1",
         }}
         onMouseEnter={needsHoverHandlers ? handleMouseEnter : undefined}
         onMouseLeave={needsHoverHandlers ? handleMouseLeave : undefined}
@@ -1141,6 +1162,9 @@ export default function AvatarComponent(props: AvatarProps) {
         {isCircle && (
           <div
             style={{
+              // CSS isolation: reset inherited styles
+              all: "initial",
+              // Restore essential properties
               position: "absolute",
               left: scaledCx - scaledR,
               top: scaledCy - scaledR,
@@ -1149,11 +1173,24 @@ export default function AvatarComponent(props: AvatarProps) {
               borderRadius: "50%",
               backgroundColor,
               zIndex: 0,
+              boxSizing: "border-box",
+              margin: "0",
+              padding: "0",
+              border: "none",
+              // Explicitly block visual effects
+              boxShadow: "none",
+              filter: "none",
+              backdropFilter: "none",
+              textShadow: "none",
+              opacity: "1",
             }}
           />
         )}
         <div
           style={{
+            // CSS isolation: reset inherited styles
+            all: "initial",
+            // Restore essential properties
             position: "absolute",
             top: 0,
             left: 0,
@@ -1166,6 +1203,17 @@ export default function AvatarComponent(props: AvatarProps) {
                 ? `scale(${hoverScale ?? 1.2})`
                 : "scale(1)",
             transformOrigin: "bottom center",
+            boxSizing: "border-box",
+            margin: "0",
+            padding: "0",
+            border: "none",
+            // Explicitly block visual effects (transform is controlled internally for hover scale)
+            boxShadow: "none",
+            filter: "none",
+            backdropFilter: "none",
+            textShadow: "none",
+            opacity: "1",
+            // Note: transform is intentionally not blocked here as it's used for hover scale animation
           }}
         >
           {avatarElement}
@@ -1176,12 +1224,26 @@ export default function AvatarComponent(props: AvatarProps) {
             height={containerHeight}
             viewBox={`0 0 ${baseWidth} ${baseHeight}`}
             style={{
+              // CSS isolation: reset inherited styles
+              all: "initial",
+              // Restore essential SVG properties
               position: "absolute",
               top: "0px",
               left: "0px",
               zIndex: 2,
               pointerEvents: "none",
               overflow: "visible",
+              display: "block",
+              boxSizing: "border-box",
+              margin: "0",
+              padding: "0",
+              border: "none",
+              // Explicitly block visual effects
+              boxShadow: "none",
+              filter: "none",
+              backdropFilter: "none",
+              textShadow: "none",
+              opacity: "1",
             }}
           >
             <defs>
@@ -1260,10 +1322,41 @@ export default function AvatarComponent(props: AvatarProps) {
   }
 
   /**
-   * No animation features enabled: return avatar directly.
-   * No wrapper container needed, just the avatar element.
+   * No animation features enabled: wrap in isolated container to prevent external CSS.
+   * The wrapper ensures CSS isolation even when no animation features are used.
    */
-  return avatarElement;
+  return (
+    <div
+      style={{
+        // CSS isolation: reset all inherited styles
+        all: "initial",
+        // Restore essential display properties
+        display: "inline-block",
+        width: containerWidth,
+        height: containerHeight,
+        // Prevent external CSS from affecting this component
+        boxSizing: "border-box",
+        margin: "0",
+        padding: "0",
+        border: "none",
+        verticalAlign: "baseline",
+        font: "initial",
+        color: "initial",
+        background: "transparent",
+        lineHeight: "normal",
+        // Explicitly block visual effects that external CSS might try to add
+        boxShadow: "none",
+        filter: "none",
+        backdropFilter: "none",
+        textShadow: "none",
+        // Prevent external transforms and opacity changes
+        transform: "none",
+        opacity: "1",
+      }}
+    >
+      {avatarElement}
+    </div>
+  );
 }
 
 /**

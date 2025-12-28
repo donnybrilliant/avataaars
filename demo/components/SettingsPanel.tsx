@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AvatarStyle } from "@vierweb/avataaars";
+import { EYE_TYPES, EYEBROW_TYPES, MOUTH_TYPES } from "../types";
 import type {
   AvatarSettings,
   AvatarCustomizationProps,
@@ -16,51 +17,6 @@ interface SettingsPanelProps {
     isSliderChange?: boolean
   ) => void;
 }
-
-const EYE_OPTIONS = [
-  "Close",
-  "Cry",
-  "Default",
-  "Dizzy",
-  "EyeRoll",
-  "Happy",
-  "Hearts",
-  "Side",
-  "Squint",
-  "Surprised",
-  "Wink",
-  "WinkWacky",
-];
-
-const EYEBROW_OPTIONS = [
-  "Angry",
-  "AngryNatural",
-  "Default",
-  "DefaultNatural",
-  "FlatNatural",
-  "RaisedExcited",
-  "RaisedExcitedNatural",
-  "SadConcerned",
-  "SadConcernedNatural",
-  "UnibrowNatural",
-  "UpDown",
-  "UpDownNatural",
-];
-
-const MOUTH_OPTIONS = [
-  "Concerned",
-  "Default",
-  "Disbelief",
-  "Eating",
-  "Grimace",
-  "Sad",
-  "ScreamOpen",
-  "Serious",
-  "Smile",
-  "Tongue",
-  "Twinkle",
-  "Vomit",
-];
 
 /**
  * SettingsPanel component provides controls for avatar animation and display settings.
@@ -128,7 +84,7 @@ export default function SettingsPanel({
   const addHoverExpression = () => {
     const newSequence = [
       ...settings.hoverSequence,
-      { mouth: "Default", eyes: "Default", eyebrow: "Default" },
+      { mouthType: "Default", eyeType: "Default", eyebrowType: "Default" },
     ];
     onSettingChange("hoverSequence", newSequence);
   };
@@ -509,9 +465,9 @@ export default function SettingsPanel({
                       👄 Mouth
                     </label>
                     <select
-                      value={expr.mouth}
+                      value={expr.mouthType}
                       onChange={(e) =>
-                        updateHoverSequence(index, "mouth", e.target.value)
+                        updateHoverSequence(index, "mouthType", e.target.value)
                       }
                       style={{
                         width: "100%",
@@ -523,7 +479,7 @@ export default function SettingsPanel({
                         boxSizing: "border-box",
                       }}
                     >
-                      {MOUTH_OPTIONS.map((opt) => (
+                      {MOUTH_TYPES.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>
@@ -543,9 +499,9 @@ export default function SettingsPanel({
                       👁️ Eyes
                     </label>
                     <select
-                      value={expr.eyes}
+                      value={expr.eyeType}
                       onChange={(e) =>
-                        updateHoverSequence(index, "eyes", e.target.value)
+                        updateHoverSequence(index, "eyeType", e.target.value)
                       }
                       style={{
                         width: "100%",
@@ -557,7 +513,7 @@ export default function SettingsPanel({
                         boxSizing: "border-box",
                       }}
                     >
-                      {EYE_OPTIONS.map((opt) => (
+                      {EYE_TYPES.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>
@@ -577,9 +533,9 @@ export default function SettingsPanel({
                       🤨 Eyebrow
                     </label>
                     <select
-                      value={expr.eyebrow}
+                      value={expr.eyebrowType}
                       onChange={(e) =>
-                        updateHoverSequence(index, "eyebrow", e.target.value)
+                        updateHoverSequence(index, "eyebrowType", e.target.value)
                       }
                       style={{
                         width: "100%",
@@ -591,7 +547,7 @@ export default function SettingsPanel({
                         boxSizing: "border-box",
                       }}
                     >
-                      {EYEBROW_OPTIONS.map((opt) => (
+                      {EYEBROW_TYPES.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>

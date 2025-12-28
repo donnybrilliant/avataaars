@@ -22,20 +22,21 @@ export enum AvatarStyle {
 
 /**
  * Expression configuration for hover animations.
- * Defines a set of expressions (mouth, eyes, eyebrow) to display during hover.
+ * Defines a set of expressions (mouthType, eyeType, eyebrowType) to display during hover.
+ * Uses the same prop names as AvatarProps for consistency.
  * 
  * @example
  * ```ts
  * const hoverSequence: HoverExpression[] = [
- *   { mouth: "Smile", eyes: "Happy", eyebrow: "Default" },
- *   { mouth: "Surprised", eyes: "Wide", eyebrow: "Raised" }
+ *   { mouthType: "Smile", eyeType: "Happy", eyebrowType: "Default" },
+ *   { mouthType: "Surprised", eyeType: "Wide", eyebrowType: "Raised" }
  * ];
  * ```
  */
 export interface HoverExpression {
-  readonly mouth: string;
-  readonly eyes: string;
-  readonly eyebrow: string;
+  readonly mouthType: string;
+  readonly eyeType: string;
+  readonly eyebrowType: string;
 }
 
 /**
@@ -47,7 +48,7 @@ export interface HoverExpression {
  * 
  * @example
  * ```tsx
- * <AvatarComponent
+ * <Avatar
  *   avatarStyle={AvatarStyle.Circle}
  *   topType="LongHairStraight"
  *   eyeType="Happy"
@@ -59,8 +60,6 @@ export interface HoverExpression {
 export interface AvatarProps {
   /** Avatar style (Circle or Transparent). Accepts enum or string for backward compatibility. */
   avatarStyle: AvatarStyle | string;
-  /** CSS class name to apply to the avatar container */
-  className?: string;
   /** Inline CSS styles to apply to the avatar container */
   style?: CSSProperties;
   
@@ -140,7 +139,6 @@ export interface AvatarProps {
  */
 export interface AvatarSvgProps {
   avatarStyle: AvatarStyle;
-  className?: string;
   style?: CSSProperties;
 }
 

@@ -1,8 +1,7 @@
 import { GIFEncoder, quantize, applyPalette } from "gifenc";
 import { createRoot } from "react-dom/client";
 import React, { type CSSProperties } from "react";
-import AvatarComponent, { AvatarStyle } from "@vierweb/avataaars";
-import { HoverExpression } from "@vierweb/avataaars";
+import Avatar, { AvatarStyle, type HoverExpression } from "@vierweb/avataaars";
 
 /**
  * Exports an animated SVG file containing multiple expression frames.
@@ -47,9 +46,9 @@ export async function exportAnimatedSVG(
        */
       const props = {
         ...baseProps,
-        eyeType: expr.eyes,
-        eyebrowType: expr.eyebrow,
-        mouthType: expr.mouth,
+        eyeType: expr.eyeType,
+        eyebrowType: expr.eyebrowType,
+        mouthType: expr.mouthType,
         animationSpeed: undefined,
         hoverScale: effectiveBackgroundColor ? 1 : undefined,
         hoverSequence: undefined,
@@ -62,7 +61,7 @@ export async function exportAnimatedSVG(
        * The container is positioned off-screen to avoid visual flicker during rendering.
        */
       const root = createRoot(container);
-      root.render(React.createElement(AvatarComponent, props));
+      root.render(React.createElement(Avatar, props));
 
       /**
        * Wait for React to complete rendering and DOM updates.
@@ -72,7 +71,7 @@ export async function exportAnimatedSVG(
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       /**
-       * Extract the inner SVG element. AvatarComponent wraps content in divs
+       * Extract the inner SVG element. Avatar wraps content in divs
        * when backgroundColor or hoverScale is set, so we need to traverse the DOM structure.
        */
       const wrapperDiv = container.querySelector("div");
@@ -189,9 +188,9 @@ export async function exportGIF(
     for (const expr of expressions) {
       const props = {
         ...baseProps,
-        eyeType: expr.eyes,
-        eyebrowType: expr.eyebrow,
-        mouthType: expr.mouth,
+        eyeType: expr.eyeType,
+        eyebrowType: expr.eyebrowType,
+        mouthType: expr.mouthType,
         // Disable animations for export
         animationSpeed: undefined,
         hoverScale: undefined,
@@ -202,15 +201,15 @@ export async function exportGIF(
         backgroundColor: effectiveBackgroundColor,
       };
 
-      // For GIF, use AvatarComponent wrapper to handle background and cropping properly
+      // For GIF, use Avatar wrapper to handle background and cropping properly
       const root = createRoot(container);
-      root.render(React.createElement(AvatarComponent, props));
+      root.render(React.createElement(Avatar, props));
 
       // Wait for React to render
       await new Promise((resolve) => requestAnimationFrame(resolve));
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // AvatarComponent wraps content in divs when backgroundColor is set
+      // Avatar wraps content in divs when backgroundColor is set
       // Extract the inner SVG element (it's inside: div > div > svg)
       const wrapperDiv = container.querySelector("div");
       const innerSvg =
@@ -343,7 +342,7 @@ export async function exportPNG(
 
     // Render the avatar component
     const root = createRoot(container);
-    root.render(React.createElement(AvatarComponent, props));
+    root.render(React.createElement(Avatar, props));
 
     // Wait for React to render
     await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -352,8 +351,7 @@ export async function exportPNG(
     // Extract the inner SVG element
     const wrapperDiv = container.querySelector("div");
     const innerSvg =
-      wrapperDiv?.querySelector("div > svg") ||
-      container.querySelector("svg");
+      wrapperDiv?.querySelector("div > svg") || container.querySelector("svg");
 
     if (innerSvg) {
       const serializer = new XMLSerializer();
@@ -670,8 +668,8 @@ function buildAnimatedSVG(
       ? `<circle cx="132" cy="160" r="120" fill="${backgroundColor}" />`
       : "";
 
-  // Add mask for bottom overflow (same as AvatarComponent wrapper) when isCircle is true
-  // In AvatarComponent, a white overlay rect uses this mask to hide overflow
+  // Add mask for bottom overflow (same as Avatar wrapper) when isCircle is true
+  // In Avatar, a white overlay rect uses this mask to hide overflow
   // For exported SVG, we apply the mask directly to the frames to hide overflow
   // SVG mask: White = visible, Black = hidden
   // So we start with white (visible everywhere) and paint black over overflow areas

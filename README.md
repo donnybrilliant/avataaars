@@ -78,9 +78,9 @@ function AnimatedAvatar() {
       hoverScale={1.2}
       // Hover animation: cycle through expressions on hover
       hoverSequence={[
-        { mouth: "Disbelief", eyes: "Surprised", eyebrow: "UpDown" },
-        { mouth: "ScreamOpen", eyes: "Dizzy", eyebrow: "Angry" },
-        { mouth: "Smile", eyes: "Happy", eyebrow: "Default" },
+        { mouthType: "Disbelief", eyeType: "Surprised", eyebrowType: "UpDown" },
+        { mouthType: "ScreamOpen", eyeType: "Dizzy", eyebrowType: "Angry" },
+        { mouthType: "Smile", eyeType: "Happy", eyebrowType: "Default" },
       ]}
       hoverAnimationSpeed={300}
       backgroundColor="#65C9FF"
@@ -127,6 +127,46 @@ function AvatarPieces() {
 }
 ```
 
+### TypeScript Support
+
+The package includes full TypeScript support with exported types for type safety:
+
+```tsx
+import Avatar, {
+  type Props,
+  type HoverExpression,
+  AvatarStyle,
+} from "@vierweb/avataaars";
+
+// Type your component props
+interface MyComponentProps {
+  avatarProps: Props;
+}
+
+function MyAvatar({ avatarProps }: MyComponentProps) {
+  // Type-safe hover sequence
+  const hoverSequence: HoverExpression[] = [
+    { mouthType: "Disbelief", eyeType: "Surprised", eyebrowType: "UpDown" },
+    { mouthType: "Smile", eyeType: "Happy", eyebrowType: "Default" },
+  ];
+
+  return (
+    <Avatar
+      {...avatarProps}
+      avatarStyle={AvatarStyle.Circle}
+      hoverSequence={hoverSequence}
+    />
+  );
+}
+```
+
+**Available Types:**
+
+- `Props` (alias for `AvatarProps`) - Component props interface
+- `HoverExpression` - Type for hover animation sequences
+- `AvatarStyle` - Enum for avatar styles (Circle, Transparent)
+- `OptionKey` - Type for avatar option keys
+
 ### Animation Props
 
 The Avatar component supports several optional animation features that can be used independently or combined:
@@ -139,9 +179,9 @@ The Avatar component supports several optional animation features that can be us
 
 ```jsx
 interface HoverExpression {
-  mouth: string;
-  eyes: string;
-  eyebrow: string;
+  mouthType: string;
+  eyeType: string;
+  eyebrowType: string;
 }
 ```
 

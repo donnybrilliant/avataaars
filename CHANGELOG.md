@@ -9,7 +9,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Future features and improvements will be documented here.
+- **Palestinian Flag Graphic**: Added Palestinian flag option for GraphicShirt
+  - Available as `graphicType="Palestine"` when `clotheType="GraphicShirt"`
+  - Automatically included in `GRAPHIC_TYPES` and `GraphicType` types
+  - Features traditional Palestinian flag design with red triangle and black, white, and green stripes
+
+## [3.0.4] - 2025-12-28
+
+### Added
+
+- **Complete CSS Isolation**: Avatar component is now fully isolated from external CSS
+  - All wrapper containers use `all: initial` to reset inherited styles
+  - Explicit protection against external shadows (`boxShadow: none`)
+  - Explicit protection against external filters (`filter: none`, `backdropFilter: none`)
+  - Explicit protection against external opacity and transform changes
+  - SVG elements and internal divs are protected from external CSS interference
+  - Component maintains consistent appearance regardless of parent page styles
+
+### Changed
+
+- **Default Export Name**: Changed from `AvatarComponent` to `Avatar` to match original fork
+  - Maintains API compatibility with original `avataaars` package
+  - All references updated throughout codebase
+- **TypeScript Import Syntax**: Updated to modern TypeScript import pattern
+  - Uses inline `type` keyword: `import Avatar, { type Props, type HoverExpression } from "@vierweb/avataaars"`
+  - Code generator now includes proper type imports in TypeScript examples
+  - README updated with modern TypeScript examples
+- **Code Generator**: Enhanced TypeScript code generation
+  - Automatically includes `type Props` import when needed
+  - Includes `type HoverExpression` import when hover sequences are used
+  - Generates typed `hoverSequence` variable for better type safety
+  - JavaScript examples remain clean without type annotations
+- **Breaking: HoverExpression Property Names**: Updated `HoverExpression` interface to use consistent naming with `Props` (Avatar component props)
+  - Changed `mouth` → `mouthType`
+  - Changed `eyes` → `eyeType`
+  - Changed `eyebrow` → `eyebrowType`
+  - Now matches the property names used in `Props` for consistency
+  - All examples and documentation updated
+
+### Removed
+
+- **Breaking**: Removed `className` prop entirely
+  - Component no longer accepts `className` prop to enforce CSS isolation
+  - Prevents external CSS classes from affecting the component
+  - Use `style` prop for any custom styling needs
+  - TypeScript will error if `className` is passed (intentional)
+
+### Fixed
+
+- Fixed linting errors for unused `className` parameter
+- Improved CSS isolation for Piece component
+- Enhanced protection for animation container elements
+
+### Technical Details
+
+- All wrapper divs and SVG elements now use `all: initial` for CSS reset
+- Explicit style properties set after reset to ensure correct display
+- Internal transforms (for hover scale) are preserved while blocking external transforms
+- Mask SVG in animation container is now fully isolated
 
 ## [3.0.3] - 2025-12-26
 

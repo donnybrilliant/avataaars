@@ -40,10 +40,10 @@ const defaultSettings: AvatarSettings = {
   hoverAnimationEnabled: true,
   hoverScaleEnabled: true,
   hoverSequence: [
-    { mouth: "Disbelief", eyes: "Surprised", eyebrow: "UpDown" },
-    { mouth: "ScreamOpen", eyes: "Dizzy", eyebrow: "Angry" },
-    { mouth: "Vomit", eyes: "Close", eyebrow: "SadConcerned" },
-    { mouth: "Grimace", eyes: "EyeRoll", eyebrow: "UnibrowNatural" },
+    { mouthType: "Disbelief", eyeType: "Surprised", eyebrowType: "UpDown" },
+    { mouthType: "ScreamOpen", eyeType: "Dizzy", eyebrowType: "Angry" },
+    { mouthType: "Vomit", eyeType: "Close", eyebrowType: "SadConcerned" },
+    { mouthType: "Grimace", eyeType: "EyeRoll", eyebrowType: "UnibrowNatural" },
   ],
   width: 300,
 };

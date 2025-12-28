@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import Avatar from "@vierweb/avataaars";
+import Avatar, { type Props } from "@vierweb/avataaars";
 import type {
   AvatarCustomizationProps,
   AvatarSettings,
 } from "../types/avatarTypes";
-import type { Props as AvatarProps } from "@vierweb/avataaars";
 
 interface AvatarPreviewProps {
   props: AvatarCustomizationProps;
@@ -35,7 +34,7 @@ export default function AvatarPreview({ props, settings }: AvatarPreviewProps) {
     return () => window.removeEventListener("resize", calculateMaxWidth);
   }, []);
 
-  const avatarProps: AvatarProps = {
+  const avatarProps: Props = {
     ...props,
   };
 
