@@ -9,22 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Palestinian Flag Graphic**: Added Palestinian flag option for GraphicShirt
-  - Available as `graphicType="Palestine"` when `clotheType="GraphicShirt"`
-  - Automatically included in `GRAPHIC_TYPES` and `GraphicType` types
-  - Features traditional Palestinian flag design with red triangle and black, white, and green stripes
+- Future features and improvements will be documented here.
 
 ## [3.0.4] - 2025-12-28
 
 ### Added
 
 - **Complete CSS Isolation**: Avatar component is now fully isolated from external CSS
+
   - All wrapper containers use `all: initial` to reset inherited styles
   - Explicit protection against external shadows (`boxShadow: none`)
   - Explicit protection against external filters (`filter: none`, `backdropFilter: none`)
   - Explicit protection against external opacity and transform changes
   - SVG elements and internal divs are protected from external CSS interference
   - Component maintains consistent appearance regardless of parent page styles
+
+- **Palestinian Flag Graphic**: Added Palestinian flag option for GraphicShirt
+  - Available as `graphicType="Palestine"` when `clotheType="GraphicShirt"`
+  - Automatically included in `GRAPHIC_TYPES` and `GraphicType` types
+  - Features traditional Palestinian flag design with red triangle and black, white, and green stripes
 
 ### Changed
 
