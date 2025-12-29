@@ -177,12 +177,37 @@ The Avatar component supports several optional animation features that can be us
 - **`hoverSequence`** (HoverExpression[]): Array of expressions to cycle through on hover.
 - **`hoverAnimationSpeed`** (number, 100-2000ms): Speed of hover sequence animation.
 - **`backgroundColor`** (string): Background color for circle style avatars (hex color).
+- **`maskBackgroundColor`** (string): Explicit color for the clip mask overlay. When provided, bypasses auto-detection for instant updates. Ideal for dynamic themes where the parent background changes frequently.
 
 ```jsx
 interface HoverExpression {
   mouthType: string;
   eyeType: string;
   eyebrowType: string;
+}
+```
+
+### With Dynamic Theme Background
+
+For applications with dynamic themes (e.g., theme sliders), use `maskBackgroundColor` for instant synchronization:
+
+```jsx
+import Avatar from "@vierweb/avataaars";
+
+function ThemedAvatar({ themeColor }) {
+  return (
+    <Avatar
+      avatarStyle="Circle"
+      topType="LongHairStraight"
+      eyeType="Happy"
+      mouthType="Smile"
+      skinColor="Light"
+      backgroundColor="#65C9FF"
+      // Pass theme color directly for instant updates (bypasses auto-detection)
+      maskBackgroundColor={themeColor}
+      hoverScale={1.2}
+    />
+  );
 }
 ```
 

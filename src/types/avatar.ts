@@ -1,9 +1,9 @@
 /**
  * Avatar type definitions
- * 
+ *
  * This module contains all type definitions related to the Avatar component,
  * including props, styles, and animation configurations.
- * 
+ *
  * @module AvatarTypes
  */
 
@@ -11,7 +11,7 @@ import type { CSSProperties } from "react";
 
 /**
  * Avatar rendering style options.
- * 
+ *
  * - Circle: Renders avatar within a circular mask with background
  * - Transparent: Renders avatar without background (used internally for animations)
  */
@@ -24,7 +24,7 @@ export enum AvatarStyle {
  * Expression configuration for hover animations.
  * Defines a set of expressions (mouthType, eyeType, eyebrowType) to display during hover.
  * Uses the same prop names as AvatarProps for consistency.
- * 
+ *
  * @example
  * ```ts
  * const hoverSequence: HoverExpression[] = [
@@ -41,11 +41,11 @@ export interface HoverExpression {
 
 /**
  * Props for the main Avatar component.
- * 
+ *
  * Supports all avatar customization options plus optional animation features.
  * Animation features (idle animation, hover scale, hover animation) are
  * independent and can be combined as needed.
- * 
+ *
  * @example
  * ```tsx
  * <Avatar
@@ -62,7 +62,7 @@ export interface AvatarProps {
   avatarStyle: AvatarStyle | string;
   /** Inline CSS styles to apply to the avatar container */
   style?: CSSProperties;
-  
+
   // Avatar customization options
   /** Top/hair style (e.g., "LongHairStraight", "ShortHairDreads01") */
   topType?: string;
@@ -90,7 +90,7 @@ export interface AvatarProps {
   mouthType?: string;
   /** Skin color (e.g., "Tanned", "Yellow", "Pale", "Light", "Brown", "DarkBrown", "Black") */
   skinColor?: string;
-  
+
   // Piece component props
   /** Piece type for Piece component */
   pieceType?: string;
@@ -98,39 +98,55 @@ export interface AvatarProps {
   pieceSize?: string;
   /** ViewBox for Piece component */
   viewBox?: string;
-  
+
   // Animation features (independent and can be combined)
-  /** 
+  /**
    * Speed for idle animation in milliseconds (500-3000ms).
    * Controls how often random expression changes occur when not hovering.
    * Lower values = faster/more frequent changes.
    */
   animationSpeed?: number;
-  /** 
+  /**
    * Scale multiplier on hover (1.05-1.32).
    * Visual scaling effect only, does not change expressions.
    */
   hoverScale?: number;
-  /** 
+  /**
    * Expression sequence for hover animation.
    * Array of HoverExpression objects to cycle through on hover.
    */
   hoverSequence?: HoverExpression[];
-  /** 
+  /**
    * Speed for hover sequence animation in milliseconds (100-2000ms).
    * Controls how fast the hover sequence cycles.
    */
   hoverAnimationSpeed?: number;
-  /** 
+  /**
    * Background color for circle style avatars (hex color string).
    * Falls back to parent element's background color if not specified.
-   * 
+   *
    * The avatar automatically watches for CSS variable changes on the
    * document root and parent elements, so the clip mask dynamically
    * responds to theme changes.
    */
   backgroundColor?: string;
-  
+
+  /**
+   * Explicit background color for the clip mask overlay.
+   * When provided, this color is used immediately without auto-detection,
+   * eliminating the ~16ms delay from MutationObserver polling.
+   *
+   * Use this for dynamic themes where the parent background changes frequently
+   * and you want instant synchronization.
+   *
+   * @example
+   * ```tsx
+   * // Pass the theme color directly for instant updates
+   * <Avatar maskBackgroundColor={themeColor} ... />
+   * ```
+   */
+  maskBackgroundColor?: string;
+
   // Original prop values for hover-only mode restoration
   /** Original eye type before hover animation (used internally) */
   originalEyeType?: string;
@@ -148,4 +164,3 @@ export interface AvatarSvgProps {
   avatarStyle: AvatarStyle;
   style?: CSSProperties;
 }
-

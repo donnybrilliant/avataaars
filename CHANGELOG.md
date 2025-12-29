@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`maskBackgroundColor` Prop**: New optional prop for instant clip mask color synchronization
+
+  - Bypasses auto-detection entirely when provided, eliminating the ~16ms MutationObserver polling delay
+  - Ideal for dynamic themes where the parent background changes frequently (e.g., theme sliders)
+  - Fully backward-compatible: existing auto-detection behavior unchanged when prop is not provided
+  - Example: `<Avatar maskBackgroundColor={themeColor} ... />`
+
 - **Dynamic CSS Variable Detection**: Clip mask now automatically responds to CSS variable changes
 
   - Uses MutationObserver to watch for style changes on document root and parent elements

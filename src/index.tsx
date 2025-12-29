@@ -199,8 +199,15 @@ export default function Avatar(props: AvatarProps) {
    * Uses MutationObserver to detect style attribute changes that may indicate
    * theme changes (e.g., via CSS variables being modified by a theme slider).
    * This allows the avatar's clip mask to dynamically respond to theme changes.
+   * 
+   * SKIP: When maskBackgroundColor is provided, auto-detection is bypassed
+   * so there's no need to watch for changes.
    */
   useEffect(() => {
+    // Skip MutationObserver if maskBackgroundColor is provided
+    // (no need to watch for changes when color is explicitly controlled)
+    if (props.maskBackgroundColor) return;
+    
     // Only observe if we need the animation container (which uses the background color for masking)
     if (!containerRef.current) return;
 
@@ -255,7 +262,7 @@ export default function Avatar(props: AvatarProps) {
         clearTimeout(debounceTimer);
       }
     };
-  }, []);
+  }, [props.maskBackgroundColor]);
 
   /**
    * Validation map for option values.
@@ -379,6 +386,7 @@ export default function Avatar(props: AvatarProps) {
     animationSpeed: rawAnimationSpeed,
     hoverScale: rawHoverScale,
     backgroundColor = "#65C9FF",
+    maskBackgroundColor, // Explicit color for clip mask (bypasses auto-detection)
     hoverSequence,
     hoverAnimationSpeed: rawHoverAnimationSpeed = 300, // Default hover animation speed
     eyeType: propEyeType,
@@ -395,11 +403,23 @@ export default function Avatar(props: AvatarProps) {
    * Re-runs when:
    * - backgroundColor prop changes
    * - CSS variables change (via styleChangeCounter from MutationObserver)
+   * - maskBackgroundColor prop changes
+   *
+   * SKIP detection if maskBackgroundColor is provided - use it directly.
+   * This enables instant synchronization for dynamic themes without the
+   * ~16ms delay from MutationObserver polling.
    *
    * This enables the clip mask to dynamically respond to theme changes,
    * such as when a theme slider modifies CSS variables on the document root.
    */
   useEffect(() => {
+    // If maskBackgroundColor is explicitly provided, use it directly - skip auto-detection
+    if (maskBackgroundColor) {
+      setParentBackgroundColor(maskBackgroundColor);
+      return; // Exit early, don't run auto-detection
+    }
+    
+    // Existing auto-detection logic runs only when maskBackgroundColor is undefined
     if (containerRef.current?.parentElement) {
       const parent = containerRef.current.parentElement;
       const computedStyle = window.getComputedStyle(parent);
@@ -427,7 +447,7 @@ export default function Avatar(props: AvatarProps) {
       // Fallback to backgroundColor prop or white if no parent
       setParentBackgroundColor(backgroundColor || "#ffffff");
     }
-  }, [backgroundColor, styleChangeCounter]);
+  }, [backgroundColor, styleChangeCounter, maskBackgroundColor]);
 
   /**
    * Validate and clamp animation parameters to safe ranges.
