@@ -9,7 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Future features and improvements will be documented here.
+### Changed
+
+### Fixed
+
+## [3.0.5] - 2025-12-29
+
+### Added
+
+- **Dynamic CSS Variable Detection**: Clip mask now automatically responds to CSS variable changes
+
+  - Uses MutationObserver to watch for style changes on document root and parent elements
+  - Automatically re-detects parent background color when CSS variables change (e.g., via a theme slider)
+  - No configuration needed - works seamlessly with dynamic theming systems
+  - Debounced updates with requestAnimationFrame for optimal performance
+
+- **Automatic Viewport-Aware Responsive Sizing**: Avatar component now automatically scales down to fit the viewport on smaller screens
+  - Fully automatic - no configuration or props needed
+  - Prevents overflow on mobile and smaller viewports
+  - Automatically calculates maximum width based on viewport size (160px padding, 600px max, 100px min)
+  - Maintains aspect ratio when scaling down
+  - Responds to window resize events in real-time
+  - Works seamlessly with existing `maxWidth: 100%` CSS for additional responsive behavior
+  - Core SVG component (`src/avatar/index.tsx`) now includes `maxWidth: 100%` and `height: auto` for responsive scaling
+
+### Changed
+
+- **Responsive Behavior**: Avatar component now automatically handles viewport constraints with no configuration needed
+  - Viewport-aware sizing is always enabled (no props to configure)
+  - Uses fixed defaults: 160px padding, 600px maximum width, 100px minimum width
+
+### Fixed
+
+- **Clip Mask Alignment**: Container padding now exactly matches clip mask extension bounds
+  - Added 2px padding to animation container to accommodate clip mask's 2px extension beyond viewBox
+  - Container dimensions now precisely match clip mask bounds, eliminating unnecessary space
+  - All elements (avatar, circle background, clip mask SVG) are properly aligned with padding offset
+  - Prevents clip mask from being clipped while maintaining pixel-perfect alignment
 
 ## [3.0.4] - 2025-12-28
 

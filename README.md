@@ -18,6 +18,7 @@ The core React component for [Avataaars Generator](https://getavataaars.com/) de
 
 - **React 19 compatible** - Full support for React 18 and 19
 - **Animation features** - Optional hover animations and expression sequences
+- **Automatic responsive sizing** - Avatars automatically scale to fit viewport on smaller screens
 - **Export support** - Export avatars as static SVG, animated SVG, or GIF
 - SVG based
 - Light weight

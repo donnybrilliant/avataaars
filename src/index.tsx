@@ -168,6 +168,95 @@ export default function Avatar(props: AvatarProps) {
   const [parentBackgroundColor, setParentBackgroundColor] =
     useState<string>("#ffffff");
 
+  // Counter to force re-detection of background color when CSS variables change
+  const [styleChangeCounter, setStyleChangeCounter] = useState(0);
+
+  // Viewport-aware sizing: automatically calculate max width based on viewport
+  // Always enabled to prevent overflow on smaller screens
+  const [maxViewportConstrainedWidth, setMaxViewportConstrainedWidth] =
+    useState(600);
+
+  useEffect(() => {
+    const calculateMaxWidth = () => {
+      const viewportWidth = window.innerWidth;
+      const padding = 160; // Account for container padding
+      const maxWidth = 600; // Maximum preferred width
+      const minWidth = 100; // Minimum width
+      const calculatedMax = Math.min(
+        maxWidth,
+        Math.max(minWidth, viewportWidth - padding)
+      );
+      setMaxViewportConstrainedWidth(calculatedMax);
+    };
+
+    calculateMaxWidth();
+    window.addEventListener("resize", calculateMaxWidth);
+    return () => window.removeEventListener("resize", calculateMaxWidth);
+  }, []);
+
+  /**
+   * Watch for CSS variable changes on document root and parent elements.
+   * Uses MutationObserver to detect style attribute changes that may indicate
+   * theme changes (e.g., via CSS variables being modified by a theme slider).
+   * This allows the avatar's clip mask to dynamically respond to theme changes.
+   */
+  useEffect(() => {
+    // Only observe if we need the animation container (which uses the background color for masking)
+    if (!containerRef.current) return;
+
+    // Debounce timer to batch rapid style changes
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const triggerUpdate = () => {
+      // Clear any pending debounce
+      if (debounceTimer !== null) {
+        clearTimeout(debounceTimer);
+      }
+      // Use requestAnimationFrame to ensure computed styles are updated
+      // before we re-detect the background color
+      debounceTimer = setTimeout(() => {
+        requestAnimationFrame(() => {
+          setStyleChangeCounter((c) => c + 1);
+        });
+      }, 16); // ~1 frame at 60fps
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "style"
+        ) {
+          triggerUpdate();
+          break;
+        }
+      }
+    });
+
+    // Observe document.documentElement (where CSS variables are typically set)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["style"],
+    });
+
+    // Also observe parent elements up the tree
+    let current: HTMLElement | null = containerRef.current.parentElement;
+    while (current && current !== document.documentElement) {
+      observer.observe(current, {
+        attributes: true,
+        attributeFilter: ["style"],
+      });
+      current = current.parentElement;
+    }
+
+    return () => {
+      observer.disconnect();
+      if (debounceTimer !== null) {
+        clearTimeout(debounceTimer);
+      }
+    };
+  }, []);
+
   /**
    * Validation map for option values.
    * Maps option keys to their valid value arrays.
@@ -301,7 +390,15 @@ export default function Avatar(props: AvatarProps) {
     ...restProps
   } = props;
 
-  // Get parent element's background color
+  /**
+   * Get parent element's background color.
+   * Re-runs when:
+   * - backgroundColor prop changes
+   * - CSS variables change (via styleChangeCounter from MutationObserver)
+   *
+   * This enables the clip mask to dynamically respond to theme changes,
+   * such as when a theme slider modifies CSS variables on the document root.
+   */
   useEffect(() => {
     if (containerRef.current?.parentElement) {
       const parent = containerRef.current.parentElement;
@@ -330,7 +427,7 @@ export default function Avatar(props: AvatarProps) {
       // Fallback to backgroundColor prop or white if no parent
       setParentBackgroundColor(backgroundColor || "#ffffff");
     }
-  }, [backgroundColor]);
+  }, [backgroundColor, styleChangeCounter]);
 
   /**
    * Validate and clamp animation parameters to safe ranges.
@@ -1026,25 +1123,6 @@ export default function Avatar(props: AvatarProps) {
     avatarStyle === AvatarStyle.Circle || avatarStyle === "Circle";
 
   /**
-   * Prepare avatar props.
-   * When animation container is needed with circle style, use Transparent
-   * so the circle background can be rendered separately in the container.
-   *
-   * All styling is handled internally via inline styles.
-   * className prop is not supported to prevent external CSS from affecting the component.
-   */
-  const avatarProps = {
-    avatarStyle: (needsAnimationContainer && isCircle
-      ? AvatarStyle.Transparent
-      : avatarStyle) as AvatarStyle,
-    style,
-    eyeType: finalEyeType,
-    eyebrowType: finalEyebrowType,
-    mouthType: finalMouthType,
-    ...restProps,
-  };
-
-  /**
    * Circle geometry constants for mask calculations.
    * These define the circle position and size for the avatar.
    * Base dimensions are 264x280 (the SVG viewBox).
@@ -1059,11 +1137,13 @@ export default function Avatar(props: AvatarProps) {
    * Extract width and height from style prop, or use defaults.
    * Calculate scale factors to maintain aspect ratio.
    * Validates that width and height are positive numbers.
+   * Automatically clamp width to viewport constraints to prevent overflow.
    */
   let containerWidth = baseWidth;
   let containerHeight = baseHeight;
   let widthScale = 1;
   let heightScale = 1;
+  let heightWasProvided = false; // Track if user explicitly provided height
 
   if (style) {
     if (style.width) {
@@ -1092,12 +1172,67 @@ export default function Avatar(props: AvatarProps) {
         parsedHeight > 0
       ) {
         containerHeight = parsedHeight;
+        heightWasProvided = true;
       }
     }
-    // Calculate scale factors
-    widthScale = containerWidth / baseWidth;
-    heightScale = containerHeight / baseHeight;
   }
+
+  // Automatically clamp width to viewport constraints to prevent overflow
+  const originalWidth = containerWidth;
+  containerWidth = Math.min(containerWidth, maxViewportConstrainedWidth);
+
+  // Only recalculate height if width was actually clamped
+  // This preserves user-provided height values when width isn't constrained
+  if (containerWidth < originalWidth) {
+    // Width was clamped - scale height proportionally to maintain aspect ratio
+    if (heightWasProvided) {
+      // User provided both width and height - preserve their custom aspect ratio
+      const userAspectRatio = containerHeight / originalWidth;
+      containerHeight = containerWidth * userAspectRatio;
+    } else {
+      // User only provided width - use default aspect ratio
+      const defaultAspectRatio = baseHeight / baseWidth;
+      containerHeight = containerWidth * defaultAspectRatio;
+    }
+  }
+
+  // Calculate scale factors
+  widthScale = containerWidth / baseWidth;
+  heightScale = containerHeight / baseHeight;
+
+  /**
+   * Prepare avatar props.
+   * When animation container is needed with circle style, use Transparent
+   * so the circle background can be rendered separately in the container.
+   *
+   * All styling is handled internally via inline styles.
+   * className prop is not supported to prevent external CSS from affecting the component.
+   *
+   * Create style prop with clamped dimensions for the inner SVG component.
+   * This ensures the SVG receives the actual displayed dimensions (after viewport clamping),
+   * not the original prop values which may be larger than the viewport allows.
+   */
+  const clampedStyle = style
+    ? {
+        ...style,
+        width: containerWidth,
+        height: containerHeight,
+      }
+    : {
+        width: containerWidth,
+        height: containerHeight,
+      };
+
+  const avatarProps = {
+    avatarStyle: (needsAnimationContainer && isCircle
+      ? AvatarStyle.Transparent
+      : avatarStyle) as AvatarStyle,
+    style: clampedStyle,
+    eyeType: finalEyeType,
+    eyebrowType: finalEyebrowType,
+    mouthType: finalMouthType,
+    ...restProps,
+  };
 
   /**
    * Core avatar element wrapped in option context provider.
@@ -1126,24 +1261,31 @@ export default function Avatar(props: AvatarProps) {
     const scaledCx = cx * widthScale;
     const scaledCy = cy * heightScale;
 
-    return (
-      <div
-        ref={containerRef}
-        style={{
-          // CSS isolation: reset all inherited styles
-          all: "initial",
-          // Restore essential display properties
-          position: "relative",
-          display: "inline-block",
-          cursor: "default",
-          width: containerWidth,
-          height: containerHeight,
-          overflow: "visible",
-          // Prevent external CSS from affecting this component
-          boxSizing: "border-box",
-          margin: "0",
-          padding: "0",
-          border: "none",
+      // Clip mask extends 2px beyond the viewBox in all directions (x="-2", width+4, etc.)
+      // Add matching padding to container to exactly match clip mask bounds
+      // With border-box, we add padding to total size to maintain content area dimensions
+      const clipMaskPadding = 2;
+      const containerTotalWidth = containerWidth + clipMaskPadding * 2;
+      const containerTotalHeight = containerHeight + clipMaskPadding * 2;
+      
+      return (
+        <div
+          ref={containerRef}
+          style={{
+            // CSS isolation: reset all inherited styles
+            all: "initial",
+            // Restore essential display properties
+            position: "relative",
+            display: "inline-block",
+            cursor: "default",
+            width: containerTotalWidth,
+            height: containerTotalHeight,
+            overflow: "visible",
+            // Prevent external CSS from affecting this component
+            boxSizing: "border-box",
+            margin: "0",
+            padding: `${clipMaskPadding}px`,
+            border: "none",
           verticalAlign: "baseline",
           font: "initial",
           color: "initial",
@@ -1166,8 +1308,10 @@ export default function Avatar(props: AvatarProps) {
               all: "initial",
               // Restore essential properties
               position: "absolute",
-              left: scaledCx - scaledR,
-              top: scaledCy - scaledR,
+              // Position accounting for container padding (clipMaskPadding)
+              // Circle position is calculated relative to avatar content area
+              left: scaledCx - scaledR + clipMaskPadding,
+              top: scaledCy - scaledR + clipMaskPadding,
               width: scaledR * 2,
               height: scaledR * 2,
               borderRadius: "50%",
@@ -1192,8 +1336,9 @@ export default function Avatar(props: AvatarProps) {
             all: "initial",
             // Restore essential properties
             position: "absolute",
-            top: 0,
-            left: 0,
+            // Position accounting for container padding (clipMaskPadding)
+            top: `${clipMaskPadding}px`,
+            left: `${clipMaskPadding}px`,
             width: containerWidth,
             height: containerHeight,
             zIndex: 1,
@@ -1228,8 +1373,10 @@ export default function Avatar(props: AvatarProps) {
               all: "initial",
               // Restore essential SVG properties
               position: "absolute",
-              top: "0px",
-              left: "0px",
+              // Position to align with avatar wrapper (accounting for container padding)
+              // The rect inside extends -2px from viewBox origin, which goes into padding area
+              top: `${clipMaskPadding}px`,
+              left: `${clipMaskPadding}px`,
               zIndex: 2,
               pointerEvents: "none",
               overflow: "visible",
@@ -1303,9 +1450,10 @@ export default function Avatar(props: AvatarProps) {
               </mask>
             </defs>
             {/**
-             * Rect with mask applied, using the parent element's background color.
+             * Rect with mask applied, using the auto-detected parent background color.
              * Covers overflow outside circle (opaque), transparent inside circle.
              * This creates the circular clipping effect that blends with the parent background.
+             * Automatically updates when CSS variables change on the document root or parent elements.
              */}
             <rect
               x="-2"

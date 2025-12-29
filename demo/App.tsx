@@ -104,6 +104,10 @@ function App() {
     return () => window.removeEventListener("resize", calculateMaxWidth);
   }, []);
 
+  // Note: We don't clamp the stored width value - it can be up to 800px for exports.
+  // The preview width is calculated as Math.min(settings.width, maxWidth) to show
+  // the actual displayed size, while preserving the export width.
+
   /**
    * Debounced save function for settings that are controlled by sliders.
    * This prevents excessive localStorage writes during slider drag operations.
@@ -252,70 +256,100 @@ function App() {
             minWidth: "200px",
           }}
         >
-          <input
-            type="range"
-            min="100"
-            max={maxWidth}
-            step="10"
-            value={Math.min(settings.width, maxWidth)}
-            onChange={(e) => {
-              const value = parseInt(e.target.value, 10);
-              if (!isNaN(value)) {
-                const clampedValue = Math.max(100, Math.min(maxWidth, value));
-                updateSetting("width", clampedValue, true);
-              }
-            }}
-            style={{
-              flex: "1 1 auto",
-              minWidth: "100px",
-              maxWidth: "300px",
-              boxSizing: "border-box",
-            }}
-          />
-          <div
-            style={{
-              position: "relative",
-              display: "inline-block",
-              flexShrink: 0,
-            }}
-          >
-            <input
-              type="number"
-              min="100"
-              max="800"
-              step="10"
-              value={settings.width}
-              onChange={(e) => {
-                const value = parseInt(e.target.value, 10);
-                if (!isNaN(value)) {
-                  const clampedValue = Math.max(100, Math.min(800, value));
-                  updateSetting("width", clampedValue, false);
-                }
-              }}
-              style={{
-                width: "clamp(80px, 10vw, 100px)",
-                padding: "6px 24px 6px 8px",
-                border: "1px solid #ddd",
-                borderRadius: "6px",
-                fontSize: "clamp(12px, 2vw + 4px, 14px)",
-                boxSizing: "border-box",
-              }}
-              title="Export width (up to 800px for high-res exports)"
-            />
-            <span
-              style={{
-                position: "absolute",
-                right: "8px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: "clamp(11px, 2vw + 3px, 14px)",
-                color: "#666",
-                pointerEvents: "none",
-              }}
-            >
-              px
-            </span>
-          </div>
+          {(() => {
+            // Calculate preview width (clamped to maxWidth for display)
+            // This is what the avatar actually displays, while settings.width can be up to 800px for exports
+            const previewWidth = Math.min(Math.max(100, settings.width), Math.max(100, maxWidth));
+            // Input always shows the stored width value (can be up to 800px for exports)
+            // The preview will be clamped automatically by the Avatar component
+            const inputValue = Math.max(100, Math.min(800, settings.width || 300));
+            const isClamped = settings.width > maxWidth;
+            
+            return (
+              <>
+                <input
+                  type="range"
+                  min="100"
+                  max={Math.max(100, maxWidth)}
+                  step="10"
+                  value={previewWidth}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value) && value >= 100) {
+                      // Slider sets the preview width (clamped to maxWidth)
+                      const clampedValue = Math.max(100, Math.min(maxWidth, value));
+                      updateSetting("width", clampedValue, true);
+                    }
+                  }}
+                  style={{
+                    flex: "1 1 auto",
+                    minWidth: "100px",
+                    maxWidth: "300px",
+                    boxSizing: "border-box",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    display: "inline-block",
+                    flexShrink: 0,
+                  }}
+                >
+                  <input
+                    type="number"
+                    min="100"
+                    max="800"
+                    step="10"
+                    value={inputValue}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value, 10);
+                      if (!isNaN(value) && value >= 100 && value <= 800) {
+                        // Input allows up to 800px for exports
+                        // If value > maxWidth, we store it for export but preview will show maxWidth
+                        updateSetting("width", value, false);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // Ensure value is valid on blur
+                      const value = parseInt(e.target.value, 10);
+                      if (isNaN(value) || value < 100) {
+                        updateSetting("width", 100, false);
+                      } else if (value > 800) {
+                        updateSetting("width", 800, false);
+                      }
+                    }}
+                    style={{
+                      width: "clamp(80px, 10vw, 100px)",
+                      padding: "6px 24px 6px 8px",
+                      border: "1px solid #ddd",
+                      borderRadius: "6px",
+                      fontSize: "clamp(12px, 2vw + 4px, 14px)",
+                      boxSizing: "border-box",
+                      color: isClamped ? "#999" : "inherit",
+                    }}
+                    title={
+                      isClamped
+                        ? `Preview: ${previewWidth}px (responsive). Export: ${settings.width}px. Type a value to change.`
+                        : `Preview width (responsive, max ${maxWidth}px). Export width up to 800px for high-res exports.`
+                    }
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      right: "8px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      fontSize: "clamp(11px, 2vw + 3px, 14px)",
+                      color: "#666",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    px
+                  </span>
+                </div>
+              </>
+            );
+          })()}
         </div>
       </div>
 

@@ -121,7 +121,14 @@ export interface AvatarProps {
    * Controls how fast the hover sequence cycles.
    */
   hoverAnimationSpeed?: number;
-  /** Background color for circle style avatars (hex color string) */
+  /** 
+   * Background color for circle style avatars (hex color string).
+   * Falls back to parent element's background color if not specified.
+   * 
+   * The avatar automatically watches for CSS variable changes on the
+   * document root and parent elements, so the clip mask dynamically
+   * responds to theme changes.
+   */
   backgroundColor?: string;
   
   // Original prop values for hover-only mode restoration

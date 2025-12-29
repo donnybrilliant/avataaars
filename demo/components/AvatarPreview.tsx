@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import Avatar, { type Props } from "@vierweb/avataaars";
 import type {
   AvatarCustomizationProps,
@@ -13,27 +12,9 @@ interface AvatarPreviewProps {
 /**
  * AvatarPreview component displays the avatar with all applied settings and animations.
  * It handles the complex logic of combining customization props with animation settings.
+ * The Avatar component automatically handles responsive sizing based on viewport.
  */
 export default function AvatarPreview({ props, settings }: AvatarPreviewProps) {
-  const [maxPreviewWidth, setMaxPreviewWidth] = useState(600);
-
-  // Calculate responsive max width for preview
-  useEffect(() => {
-    const calculateMaxWidth = () => {
-      const viewportWidth = window.innerWidth;
-      const padding = 160; // Total padding from container and preview
-      const calculatedMax = Math.min(
-        600,
-        Math.max(100, viewportWidth - padding)
-      );
-      setMaxPreviewWidth(calculatedMax);
-    };
-
-    calculateMaxWidth();
-    window.addEventListener("resize", calculateMaxWidth);
-    return () => window.removeEventListener("resize", calculateMaxWidth);
-  }, []);
-
   const avatarProps: Props = {
     ...props,
   };
@@ -106,15 +87,12 @@ export default function AvatarPreview({ props, settings }: AvatarPreviewProps) {
   // Calculate height based on width to maintain aspect ratio (264:280)
   // Avatar's natural aspect ratio is 264/280 = 0.942857...
   const aspectRatio = 280 / 264; // height/width ratio
+  const height = settings.width * aspectRatio;
 
-  // For preview, clamp width to viewport to prevent overflow
-  // But allow the full width value to be stored for exports
-  const previewWidth = Math.min(settings.width, maxPreviewWidth);
-  const height = previewWidth * aspectRatio;
-
-  // Apply style prop with clamped width for preview
+  // Apply style prop with width/height.
+  // The Avatar component automatically handles responsive sizing based on viewport.
   avatarProps.style = {
-    width: `${previewWidth}px`,
+    width: `${settings.width}px`,
     height: `${height}px`,
   };
 

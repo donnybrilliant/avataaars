@@ -12,10 +12,7 @@ import { AvatarStyle } from "../types";
 export { AvatarStyle };
 export type { AvatarSvgProps as Props };
 
-export default function Avatar({
-  avatarStyle,
-  style,
-}: AvatarSvgProps) {
+export default function Avatar({ avatarStyle, style }: AvatarSvgProps) {
   const path1 = useId();
   const path2 = useId();
   const path3 = useId();
@@ -26,8 +23,19 @@ export default function Avatar({
   const circle = avatarStyle === AvatarStyle.Circle;
 
   // Extract width and height from style prop if provided, otherwise use defaults
-  const svgWidth = style?.width ? (typeof style.width === "number" ? `${style.width}px` : style.width) : "264px";
-  const svgHeight = style?.height ? (typeof style.height === "number" ? `${style.height}px` : style.height) : "280px";
+  const svgWidth = style?.width
+    ? typeof style.width === "number"
+      ? `${style.width}px`
+      : style.width
+    : "264px";
+  const svgHeight = style?.height
+    ? typeof style.height === "number"
+      ? `${style.height}px`
+      : style.height
+    : "280px";
+
+  // Determine if height was explicitly provided
+  const heightWasProvided = style?.height !== undefined;
 
   // Create isolated style object that prevents external CSS from affecting the SVG
   const isolatedStyle: CSSProperties = {
@@ -35,17 +43,22 @@ export default function Avatar({
     all: "initial",
     // Restore essential SVG properties
     display: "block",
-    // Apply width/height from style prop or defaults
+    // Apply width from style prop or defaults
     width: svgWidth,
-    height: svgHeight,
+    // Make SVG responsive: scale down to fit container while maintaining aspect ratio
+    // The viewBox (0 0 264 280) ensures aspect ratio is preserved when maxWidth constrains the width
+    maxWidth: "100%",
+    // Use provided height if given, otherwise auto for responsive scaling
+    height: heightWasProvided ? svgHeight : "auto",
     // Merge other style properties (excluding width/height to avoid duplication)
-    ...(style ? Object.entries(style)
-      .filter(([key]) => key !== "width" && key !== "height")
-      .reduce((acc, [key, value]) => {
-        acc[key] = value;
-        return acc;
-      }, {} as Record<string, CSSProperties[keyof CSSProperties]>)
-    : {}),
+    ...(style
+      ? Object.entries(style)
+          .filter(([key]) => key !== "width" && key !== "height")
+          .reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+          }, {} as Record<string, CSSProperties[keyof CSSProperties]>)
+      : {}),
     // Ensure these critical properties are always set to prevent external CSS interference
     boxSizing: "border-box",
     margin: "0",

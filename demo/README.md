@@ -14,6 +14,7 @@ This interactive demo showcases all features of the Avataaars React component, i
 
 - Complete avatar customization with all available options
 - Animation settings and hover effects
+- **Automatic responsive sizing** - Avatars automatically scale to fit viewport
 - Export functionality (GIF, SVG)
 - Code generation for easy copy-paste
 - Settings persistence via localStorage
@@ -78,6 +79,7 @@ This will start a Vite dev server (usually at `http://localhost:5173`) where you
 ### Avatar Customization
 
 - **Live Preview**: See changes in real-time as you adjust options
+
 - **All Avatar Options**: Access to every customization option:
   - Top/Hair styles and colors
   - Accessories (glasses, etc.)
@@ -86,6 +88,8 @@ This will start a Vite dev server (usually at `http://localhost:5173`) where you
   - Eye, eyebrow, and mouth expressions
   - Skin tones
   - Avatar style (Circle or Transparent)
+- **Responsive Sizing**: Avatars automatically scale down on smaller screens to prevent overflow
+- **Size Controls**: Adjust avatar width with the slider - it automatically scales to fit your viewport
 
 ### Animation Features
 
