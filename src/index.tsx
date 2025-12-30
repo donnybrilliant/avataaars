@@ -199,7 +199,7 @@ export default function Avatar(props: AvatarProps) {
    * Uses MutationObserver to detect style attribute changes that may indicate
    * theme changes (e.g., via CSS variables being modified by a theme slider).
    * This allows the avatar's clip mask to dynamically respond to theme changes.
-   * 
+   *
    * SKIP: When maskBackgroundColor is provided, auto-detection is bypassed
    * so there's no need to watch for changes.
    */
@@ -207,7 +207,7 @@ export default function Avatar(props: AvatarProps) {
     // Skip MutationObserver if maskBackgroundColor is provided
     // (no need to watch for changes when color is explicitly controlled)
     if (props.maskBackgroundColor) return;
-    
+
     // Only observe if we need the animation container (which uses the background color for masking)
     if (!containerRef.current) return;
 
@@ -399,27 +399,26 @@ export default function Avatar(props: AvatarProps) {
   } = props;
 
   /**
-   * Get parent element's background color.
+   * Get parent element's background color via auto-detection.
    * Re-runs when:
    * - backgroundColor prop changes
    * - CSS variables change (via styleChangeCounter from MutationObserver)
-   * - maskBackgroundColor prop changes
    *
-   * SKIP detection if maskBackgroundColor is provided - use it directly.
-   * This enables instant synchronization for dynamic themes without the
-   * ~16ms delay from MutationObserver polling.
+   * SKIP entirely if maskBackgroundColor is provided - the prop is used directly
+   * in the render (via clipMaskColor) without going through state.
+   * This enables instant synchronization for dynamic themes without any delay.
    *
    * This enables the clip mask to dynamically respond to theme changes,
    * such as when a theme slider modifies CSS variables on the document root.
    */
   useEffect(() => {
-    // If maskBackgroundColor is explicitly provided, use it directly - skip auto-detection
+    // Skip auto-detection entirely if maskBackgroundColor is provided
+    // The prop is used directly in render via clipMaskColor, no state needed
     if (maskBackgroundColor) {
-      setParentBackgroundColor(maskBackgroundColor);
-      return; // Exit early, don't run auto-detection
+      return;
     }
-    
-    // Existing auto-detection logic runs only when maskBackgroundColor is undefined
+
+    // Auto-detection logic runs only when maskBackgroundColor is undefined
     if (containerRef.current?.parentElement) {
       const parent = containerRef.current.parentElement;
       const computedStyle = window.getComputedStyle(parent);
@@ -1281,31 +1280,36 @@ export default function Avatar(props: AvatarProps) {
     const scaledCx = cx * widthScale;
     const scaledCy = cy * heightScale;
 
-      // Clip mask extends 2px beyond the viewBox in all directions (x="-2", width+4, etc.)
-      // Add matching padding to container to exactly match clip mask bounds
-      // With border-box, we add padding to total size to maintain content area dimensions
-      const clipMaskPadding = 2;
-      const containerTotalWidth = containerWidth + clipMaskPadding * 2;
-      const containerTotalHeight = containerHeight + clipMaskPadding * 2;
-      
-      return (
-        <div
-          ref={containerRef}
-          style={{
-            // CSS isolation: reset all inherited styles
-            all: "initial",
-            // Restore essential display properties
-            position: "relative",
-            display: "inline-block",
-            cursor: "default",
-            width: containerTotalWidth,
-            height: containerTotalHeight,
-            overflow: "visible",
-            // Prevent external CSS from affecting this component
-            boxSizing: "border-box",
-            margin: "0",
-            padding: `${clipMaskPadding}px`,
-            border: "none",
+    // Clip mask extends 2px beyond the viewBox in all directions (x="-2", width+4, etc.)
+    // Add matching padding to container to exactly match clip mask bounds
+    // With border-box, we add padding to total size to maintain content area dimensions
+    const clipMaskPadding = 2;
+    const containerTotalWidth = containerWidth + clipMaskPadding * 2;
+    const containerTotalHeight = containerHeight + clipMaskPadding * 2;
+
+    // Calculate the final color to use for clip mask
+    // When maskBackgroundColor is provided, use it directly (no state) for instant updates
+    // Use || instead of ?? to treat empty strings as falsy (invalid SVG fill)
+    const clipMaskColor = maskBackgroundColor || parentBackgroundColor;
+
+    return (
+      <div
+        ref={containerRef}
+        style={{
+          // CSS isolation: reset all inherited styles
+          all: "initial",
+          // Restore essential display properties
+          position: "relative",
+          display: "inline-block",
+          cursor: "default",
+          width: containerTotalWidth,
+          height: containerTotalHeight,
+          overflow: "visible",
+          // Prevent external CSS from affecting this component
+          boxSizing: "border-box",
+          margin: "0",
+          padding: `${clipMaskPadding}px`,
+          border: "none",
           verticalAlign: "baseline",
           font: "initial",
           color: "initial",
@@ -1470,17 +1474,18 @@ export default function Avatar(props: AvatarProps) {
               </mask>
             </defs>
             {/**
-             * Rect with mask applied, using the auto-detected parent background color.
+             * Rect with mask applied, using the clip mask color.
+             * When maskBackgroundColor prop is provided, uses it directly for instant updates.
+             * Otherwise falls back to auto-detected parent background color.
              * Covers overflow outside circle (opaque), transparent inside circle.
              * This creates the circular clipping effect that blends with the parent background.
-             * Automatically updates when CSS variables change on the document root or parent elements.
              */}
             <rect
               x="-2"
               y="-2"
               width={baseWidth + 4}
               height={baseHeight + 4}
-              fill={parentBackgroundColor}
+              fill={clipMaskColor}
               mask={`url(#${maskId})`}
             />
           </svg>
